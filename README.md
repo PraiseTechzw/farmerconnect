@@ -6,7 +6,7 @@
 *Click the image above to watch a demo video of the app!*
 
 ## **Overview**
-[App Name] is an AI-powered farming assistant designed to help farmers optimize crop management and make informed decisions. By leveraging advanced AI and real-time data, this app provides personalized crop recommendations, disease identification, and weather-based insights.
+Farmer Connect is an AI-powered farming assistant designed to help farmers optimize crop management and make informed decisions. By leveraging advanced AI and real-time data, this app provides personalized crop recommendations, disease identification, and weather-based insights.
 
 ---
 
@@ -56,8 +56,8 @@ flutter pub get
 Clone this repository to your local machine using:
 
 ```bash
-git clone https://github.com/yourusername/appname.git
-cd appname
+git clone https://github.com/yourusername/farmerconnect.git
+cd farmerconnect
 ```
 
 ### **Run the App**
