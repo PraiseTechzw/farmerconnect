@@ -69,7 +69,6 @@ Future<String> chatWithAI(String userInput) async {
     throw Exception('Error during chat interaction: $e');
   }
 }
-
 Future<List<CropRecommendation>> getCropRecommendations({
   required String temperature,
   required String weatherType,
@@ -95,7 +94,6 @@ Please provide crop recommendations for this location, including:
 - Crop name
 - Yield
 - Harvest date
-- Specific care tips
 
 If any information is missing or unclear, provide default recommendations based on typical conditions for the given location and season.
 ''';
@@ -106,9 +104,7 @@ If any information is missing or unclear, provide default recommendations based 
     // Print the generated response to the console for debugging
     print('Generated Crop Recommendations Response: ${response.text}');
 
-    // Check if the response is empty or lacks sufficient data
     if (response.text == null || response.text!.trim().isEmpty) {
-      // Provide default recommendations or handle the error
       print('No recommendations provided. Returning default recommendations.');
       return _getDefaultRecommendations();
     }
@@ -119,13 +115,11 @@ If any information is missing or unclear, provide default recommendations based 
     String? cropName;
     String? cropYield;
     String? harvestDate;
-    List<String> careTipsBuffer = [];
 
     for (var line in cropData) {
       line = line.trim();
 
-      // Match crop names from headings (e.g., **1. Broad Beans (Fava Beans):**)
-      final cropMatch = RegExp(r'\*\*\d+\. (.*?):\*\*').firstMatch(line);
+      final cropMatch = RegExp(r'^\*\*\d+\.\s*(.*?)\s*\*\*').firstMatch(line);
       if (cropMatch != null) {
         if (cropName != null && cropYield != null && harvestDate != null) {
           recommendations.add(CropRecommendation(
@@ -135,35 +129,22 @@ If any information is missing or unclear, provide default recommendations based 
             icon: _getCropIcon(cropName),
           ));
         }
-        // Reset for new crop
         cropName = cropMatch.group(1)?.trim();
         cropYield = null;
         harvestDate = null;
-        careTipsBuffer = [];
-      }
-
-      // Match crop yield (e.g., **Yield:**  2-3 kg/plant)
-      final yieldMatch = RegExp(r'\*\*Yield:\*\* (.*)').firstMatch(line);
-      if (yieldMatch != null) {
-        cropYield = yieldMatch.group(1)?.trim();
-      }
-
-      // Match harvest date (e.g., **Harvest Date:**  60-80 days after planting)
-      final harvestDateMatch = RegExp(r'\*\*Harvest Date:\*\* (.*)').firstMatch(line);
-      if (harvestDateMatch != null) {
-        harvestDate = harvestDateMatch.group(1)?.trim();
-      }
-
-      // Collect care tips until a new crop starts
-      final careTipsMatch = RegExp(r'\*\*Care Tips:\*\*').firstMatch(line);
-      if (careTipsMatch != null) {
-        // Continue accumulating care tips
-        careTipsBuffer.add(line.replaceFirst(careTipsMatch.group(0)!, '').trim());
         continue;
       }
-      
-      if (careTipsBuffer.isNotEmpty && line.isNotEmpty) {
-        careTipsBuffer.add(line);
+
+      final yieldMatch = RegExp(r'\*\*Yield:\*\*\s*(.*)').firstMatch(line);
+      if (yieldMatch != null) {
+        cropYield = yieldMatch.group(1)?.trim();
+        continue;
+      }
+
+      final harvestDateMatch = RegExp(r'\*\*Harvest Date:\*\*\s*(.*)').firstMatch(line);
+      if (harvestDateMatch != null) {
+        harvestDate = harvestDateMatch.group(1)?.trim();
+        continue;
       }
     }
 
@@ -177,16 +158,15 @@ If any information is missing or unclear, provide default recommendations based 
       ));
     }
 
-    // Print the final recommendations for debugging
     print('Final Crop Recommendations: ${recommendations.map((r) => r.cropName).toList()}');
     
     return recommendations;
   } catch (e) {
-    // Print the error to the console for debugging
     print('Error in getCropRecommendations: $e');
     return _getDefaultRecommendations();
   }
 }
+
 
 List<CropRecommendation> _getDefaultRecommendations() {
   // Provide a set of default recommendations or fallback options

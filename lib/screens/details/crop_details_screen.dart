@@ -1,5 +1,5 @@
-import 'package:farmerconnect/models/crop_detail.dart';
 import 'package:flutter/material.dart';
+import 'package:farmerconnect/models/crop_detail.dart';
 import 'package:farmerconnect/models/cropreco.dart';
 import 'package:farmerconnect/service/gemini_api.dart';
 
@@ -33,33 +33,6 @@ class CropDetailScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Enhanced Image Presentation
-                    Card(
-                      elevation: 5,
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          cropDetails.imageUrl.isNotEmpty 
-                              ? cropDetails.imageUrl 
-                              : 'https://example.com/fallback-image.png', // Fallback image URL
-                          height: 250,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Center(
-                              child: Icon(Icons.broken_image, size: 200),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(child: CircularProgressIndicator());
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
                     // Description
                     _buildSectionTitle('Description'),
                     _buildFormattedDescription(_sanitizeText(cropDetails.description)),
@@ -121,21 +94,19 @@ class CropDetailScreen extends StatelessWidget {
   }
 
   /// Builds a formatted description with headings and bullet points.
-Widget _buildFormattedDescription(String description) {
-  // Split the description by headings marked with '***'
-  final sections = description.split(RegExp(r'\*\*\*')).where((section) => section.trim().isNotEmpty).toList();
+  Widget _buildFormattedDescription(String description) {
+    final sections = description.split(RegExp(r'\*\*\*')).where((section) => section.trim().isNotEmpty).toList();
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: sections.map((section) {
-      // Further split by paragraphs (using '\n\n' as delimiters)
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: sections.map((section) {
       final contentParts = section.split(RegExp(r'\n{2,}')).where((content) => content.isNotEmpty).toList();
 
       if (contentParts.isEmpty) {
         return const SizedBox.shrink();  // Skip empty sections
       }
 
-      final heading = contentParts.first.trim(); // The first line is the heading
+      final heading = contentParts.first.trim();
       final content = contentParts.length > 1 ? contentParts.sublist(1).join("\n\n") : '';
 
       return Padding(
@@ -143,7 +114,6 @@ Widget _buildFormattedDescription(String description) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Display the heading in bold and larger font
             Text(
               heading,
               style: const TextStyle(
@@ -153,8 +123,6 @@ Widget _buildFormattedDescription(String description) {
               ),
             ),
             const SizedBox(height: 8),
-            
-            // Display the content under the heading as bullet points
             _buildDescriptionContent(content),
           ],
         ),
@@ -163,28 +131,27 @@ Widget _buildFormattedDescription(String description) {
   );
 }
 
-/// Builds the content part of the description under a heading, formatted as bullet points.
-Widget _buildDescriptionContent(String content) {
-  final lines = content.split('\n').where((line) => line.trim().isNotEmpty).toList();
+  /// Builds the content part of the description under a heading, formatted as bullet points.
+  Widget _buildDescriptionContent(String content) {
+    final lines = content.split('\n').where((line) => line.trim().isNotEmpty).toList();
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: lines.map((line) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(Icons.circle, size: 6, color: Colors.green),
-            const SizedBox(width: 8),
-            Expanded(child: Text(line.trim(), style: const TextStyle(fontSize: 16))),
-          ],
-        ),
-      );
-    }).toList(),
-  );
-}
-
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: lines.map((line) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.circle, size: 6, color: Colors.green),
+              const SizedBox(width: 8),
+              Expanded(child: Text(line.trim(), style: const TextStyle(fontSize: 16))),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
 
   /// Builds a section with tips, formatting each tip as a bullet point.
   Widget _buildTipsSection(String tips) {
