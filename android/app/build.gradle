@@ -35,6 +35,9 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         minSdkVersion = 21
+        manifestPlaceholders += [
+			'appAuthRedirectScheme': 'com.kinde.myapp'
+		]
     
 
     }
