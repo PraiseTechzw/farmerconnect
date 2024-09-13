@@ -61,16 +61,16 @@ Widget build(BuildContext context) {
 
   return Scaffold(
     appBar: AppBar(
-      backgroundColor: Colors.deepPurple,
+      backgroundColor: Colors.green[800],
       title: const Text('FarmerConnect'),
     ),
     drawer: Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
+           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.deepPurple,
+              color:  Colors.green[800],
             ),
             child: Text(
               'Navigation',
@@ -86,7 +86,7 @@ Widget build(BuildContext context) {
           ),
           ListTile(
             leading: const Icon(Icons.chat),
-            title: const Text('Farmers Interaction'),
+            title: const Text('Farmers IA'),
             onTap: () {
               Navigator.push(
                 context,
@@ -129,6 +129,8 @@ Widget build(BuildContext context) {
           child: SingleChildScrollView(
             child: Column(
               children: [
+
+                 const  Text("Crop Recommendations", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),),
                 // Pass weather data and location to CropRecommendationWidget
                 _isLoading
                     ? const CircularProgressIndicator()
@@ -145,7 +147,7 @@ Widget build(BuildContext context) {
                           )
                         : const Text('No crop recommendations available'),
                
-              
+            
                 
               ],
             ),

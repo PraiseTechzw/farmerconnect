@@ -27,16 +27,17 @@ class WeatherCard extends StatelessWidget {
     final String currentDay = DateFormat('EEEE').format(DateTime.now());
 
     return Card(
-      elevation: 8,
+      elevation: 12,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(25),
       ),
+      color: Colors.blueGrey[50], // Enhanced background color
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Time and Season
+            // Time and season
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -46,7 +47,7 @@ class WeatherCard extends StatelessWidget {
                     Text(
                       currentDay,
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
@@ -65,47 +66,53 @@ class WeatherCard extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Main Temperature and Weather Type
+            // Temperature and weather type
             Row(
               children: [
+                // Weather icon based on weatherType
+                Icon(
+                  _getWeatherIcon(weatherType),
+                  size: 80,
+                  color: Colors.blueAccent, // Icon color
+                ),
+                const SizedBox(width: 16),
                 Text(
                   '$temperature°C',
                   style: const TextStyle(
-                    fontSize: 48,
+                    fontSize: 52,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Weather: $weatherType',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black54,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Pressure: $pressure mb',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
+                    color: Colors.black87,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+
+            // Weather type and pressure
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  weatherType,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black54,
+                  ),
+                ),
+                Text(
+                  'Pressure: $pressure mb',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
 
             // Weather condition cards
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildWeatherInfoCard('Wind', '$windSpeed km/h', Icons.air),
                 _buildWeatherInfoCard('Humidity', '$humidity%', Icons.opacity),
@@ -118,14 +125,21 @@ class WeatherCard extends StatelessWidget {
     );
   }
 
-  // Helper function to build weather info cards
+  // Build weather info card
   Widget _buildWeatherInfoCard(String label, String value, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       width: 100,
       decoration: BoxDecoration(
-        color: Colors.blueAccent.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.lightBlueAccent.withOpacity(0.2), // Enhanced card color
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blueAccent.withOpacity(0.3),
+            offset: const Offset(0, 5),
+            blurRadius: 10,
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -157,19 +171,35 @@ class WeatherCard extends StatelessWidget {
     );
   }
 
-  // Helper function to get dynamic season icons
+  // Helper function to get season icons
   Widget _getSeasonIcon(String season) {
     switch (season.toLowerCase()) {
       case 'summer':
-        return const Icon(Icons.wb_sunny, color: Colors.yellow, size: 40);
+        return const Icon(Icons.wb_sunny, color: Colors.orange, size: 40);
       case 'autumn':
-        return const Icon(Icons.park, color: Colors.orange, size: 40);
+        return const Icon(Icons.park, color: Colors.brown, size: 40);
       case 'winter':
         return const Icon(Icons.ac_unit, color: Colors.lightBlue, size: 40);
       case 'spring':
         return const Icon(Icons.grass, color: Colors.green, size: 40);
       default:
-        return const Icon(Icons.wb_sunny, color: Colors.yellow, size: 40);
+        return const Icon(Icons.wb_sunny, color: Colors.orange, size: 40);
+    }
+  }
+
+  // Helper function to get the corresponding icon for the weather type
+  IconData _getWeatherIcon(String weatherType) {
+    switch (weatherType.toLowerCase()) {
+      case 'rainy':
+        return Icons.grain;
+      case 'sunny':
+        return Icons.wb_sunny;
+      case 'cloudy':
+        return Icons.cloud;
+      case 'snowy':
+        return Icons.ac_unit;
+      default:
+        return Icons.wb_sunny;
     }
   }
 }

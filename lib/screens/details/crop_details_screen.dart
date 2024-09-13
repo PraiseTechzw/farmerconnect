@@ -7,15 +7,17 @@ class CropDetailScreen extends StatelessWidget {
   final CropRecommendation crop;
 
   const CropDetailScreen({super.key, required this.crop});
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(crop.cropName),
+        elevation: 0,
+        backgroundColor: Colors.green[800],
       ),
       body: FutureBuilder<CropDetails>(
-        future: GeminiService().getCropDetails(crop.cropName, crop.crop_yield), // Fetch additional details via Gemini API
+        future: GeminiService().getCropDetails(crop.cropName, crop.crop_yield),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -31,72 +33,58 @@ class CropDetailScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Display the dynamically fetched image
-                    Center(
-                      child: Image.network(
-                        cropDetails.imageUrl, // Assuming this is the URL of the image
-                        height: 200,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          // Fallback image in case of error
-                          return const Icon(Icons.broken_image, size: 200);
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const Center(child: CircularProgressIndicator());
-                        },
+                    // Enhanced Image Presentation
+                    Card(
+                      elevation: 5,
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          cropDetails.imageUrl.isNotEmpty 
+                              ? cropDetails.imageUrl 
+                              : 'https://example.com/fallback-image.png', // Fallback image URL
+                          height: 250,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(Icons.broken_image, size: 200),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(child: CircularProgressIndicator());
+                          },
+                        ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    
+                    // Description
+                    _buildSectionTitle('Description'),
+                    _buildFormattedDescription(_sanitizeText(cropDetails.description)),
+      
                     const SizedBox(height: 20),
-                    Text(
-                      cropDetails.description,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Best Harvest Date:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
+                    
+                    // Best Harvest Date
+                    _buildSectionTitle('Best Harvest Date'),
                     Text(
                       crop.harvestDate,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Season:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
+                    
+                    // Season
+                    _buildSectionTitle('Season'),
                     Text(
                       cropDetails.season,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Additional Tips:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    _buildTipsSection(cropDetails.tips),
+                    
+                    // Additional Tips
+                    _buildSectionTitle('Additional Tips'),
+                    _buildTipsSection(_sanitizeText(cropDetails.tips)),
                   ],
                 ),
               ),
@@ -107,9 +95,99 @@ class CropDetailScreen extends StatelessWidget {
     );
   }
 
+  /// Sanitizes the text by removing unwanted symbols like '***'.
+  String _sanitizeText(String text) {
+    return text.replaceAll(RegExp(r'[\*\n]+'), ' ').trim();
+  }
+
+  /// Builds a section title with optional underline.
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Expanded(child: Divider(thickness: 2)),
+        ],
+      ),
+    );
+  }
+
+  /// Builds a formatted description with headings and bullet points.
+Widget _buildFormattedDescription(String description) {
+  // Split the description by headings marked with '***'
+  final sections = description.split(RegExp(r'\*\*\*')).where((section) => section.trim().isNotEmpty).toList();
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: sections.map((section) {
+      // Further split by paragraphs (using '\n\n' as delimiters)
+      final contentParts = section.split(RegExp(r'\n{2,}')).where((content) => content.isNotEmpty).toList();
+
+      if (contentParts.isEmpty) {
+        return const SizedBox.shrink();  // Skip empty sections
+      }
+
+      final heading = contentParts.first.trim(); // The first line is the heading
+      final content = contentParts.length > 1 ? contentParts.sublist(1).join("\n\n") : '';
+
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Display the heading in bold and larger font
+            Text(
+              heading,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 8),
+            
+            // Display the content under the heading as bullet points
+            _buildDescriptionContent(content),
+          ],
+        ),
+      );
+    }).toList(),
+  );
+}
+
+/// Builds the content part of the description under a heading, formatted as bullet points.
+Widget _buildDescriptionContent(String content) {
+  final lines = content.split('\n').where((line) => line.trim().isNotEmpty).toList();
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: lines.map((line) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.circle, size: 6, color: Colors.green),
+            const SizedBox(width: 8),
+            Expanded(child: Text(line.trim(), style: const TextStyle(fontSize: 16))),
+          ],
+        ),
+      );
+    }).toList(),
+  );
+}
+
+
   /// Builds a section with tips, formatting each tip as a bullet point.
   Widget _buildTipsSection(String tips) {
-    // Split the tips into bullet points by looking for sentence-ending punctuation (e.g., period).
     final tipsList = tips.split(RegExp(r'[.!?]')).where((tip) => tip.isNotEmpty).toList();
 
     return Column(
@@ -120,7 +198,8 @@ class CropDetailScreen extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('• ', style: TextStyle(fontSize: 18)),
+              const Icon(Icons.check_circle, size: 20, color: Colors.green),
+              const SizedBox(width: 8),
               Expanded(child: Text(tip.trim(), style: const TextStyle(fontSize: 16))),
             ],
           ),
