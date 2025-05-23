@@ -1,5 +1,3 @@
-
-
 # **Farmer Connect** 🌾🚜
 
 [![Demo Video]([demo-video-link](https://youtu.be/FM7KA57-1dE?si=YFPB2HftXOTHJvns))][(demo-video-link](https://youtu.be/FM7KA57-1dE?si=YFPB2HftXOTHJvns))  
@@ -14,22 +12,25 @@ Farmer Connect is an AI-powered farming assistant designed to help farmers optim
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Installation](#installation)
+- [Configuration](#configuration)
 - [Usage](#usage)
 - [Technology Stack](#technology-stack)
+- [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
+- [Contact](#contact)
 
 ---
 
 ## **Features**
 ### 🌱 **Farmer AI Screen**
 - **Interactive Chat**: Ask farming-related questions and receive expert advice through AI.
-- **Disease Identification**: Upload crop images to instantly identify diseases and receive actionable solutions.
+- **Disease Identification**: Upload crop images (from gallery or camera) to instantly identify diseases. The AI provides details such as disease name, symptoms, recommended treatments, and preventative measures.
 
 ### 🌦️ **Home Screen**
-- **Weather Card**: Displays real-time weather information based on your location.
-- **Crop Recommendations**: Provides crop suggestions based on current weather conditions, along with expected harvest and yield details.
-- **Detailed Crop Info**: Access a detailed screen with tips and comprehensive information about the recommended crops.
+- **Weather Card**: Displays real-time weather information based on your current location, including temperature, conditions, wind speed, humidity, rainfall, and pressure. Shows an error message if weather data cannot be fetched.
+- **Crop Recommendations**: Provides crop suggestions based on current weather conditions, along with expected harvest dates and yield potential. Displays an error message if recommendations cannot be generated due to missing weather data.
+- **Detailed Crop Info**: Access a detailed screen with tips and comprehensive information about the recommended crops (functionality depends on API response for specific crops).
 
 ---
 
@@ -69,17 +70,51 @@ flutter run
 
 ---
 
+## **Configuration**
+
+### **API Key Setup**
+To use the AI features (including crop analysis and recommendations), you need to set up your Gemini API key:
+1. Create a new file named `.env` in the root directory of the project.
+2. Open the `.env.example` file (also in the root directory).
+3. Copy the entire content from `.env.example` and paste it into your newly created `.env` file.
+4. In the `.env` file, replace `YOUR_API_KEY_HERE` with your actual Gemini API key.
+
+**Example `.env` file:**
+```env
+GEMINI_API_KEY=xxxxxxxxxxxxxxxxxxxxxxx
+```
+**Important:** The `.env` file is listed in `.gitignore`, so your API key will not be committed to version control. Do not share your API key publicly.
+
+---
+
 ## **Usage**
-1. **Farmer AI Screen**: Start a conversation with the AI or upload a crop image for disease identification.
-2. **Home Screen**: Check the weather and explore crop recommendations based on current conditions.
-3. **Crop Details**: Tap a crop recommendation to dive into detailed tips and insights about the crop.
+1. **Farmer AI Screen**: Start a conversation with the AI by typing a message, or upload a crop image (using the camera or gallery option) for disease identification and advice.
+2. **Home Screen**: View current weather conditions and explore crop recommendations tailored to your local weather.
+3. **Crop Details**: Tap on a crop recommendation to learn more about it (details may vary based on information availability).
 
 ---
 
 ## **Technology Stack**
-- **Flutter**: Frontend development.
-- **Gemini AI API**: AI model for crop disease identification and advice.
-- **Google Generative AI**: Weather-based crop recommendations.
+- **Flutter**: Frontend development for cross-platform mobile application.
+- **Dart**: Programming language for Flutter.
+- **Gemini AI API (Google Generative AI)**: Powers the AI chat, crop disease identification from images, and generation of crop details and recommendations.
+- **Visual Crossing Weather API**: Provides weather data for the home screen and crop recommendations.
+- **Geolocator Plugin**: Fetches the device's current location for weather data.
+- **Flutter DotEnv**: Manages API keys securely.
+- **Mockito**: Used for creating mocks for unit testing.
+
+---
+
+## **Testing**
+The project includes unit tests for services to ensure their reliability and correctness. These tests cover the core business logic within the services, such as API interactions, data parsing, and error handling.
+
+### **Running Tests**
+To run all unit tests, execute the following command in your terminal from the project root directory:
+
+```bash
+flutter test
+```
+This command will discover and run all files ending with `_test.dart` in the `test` directory. Ensure all dependencies are fetched (using `flutter pub get`) before running tests.
 
 ---
 
