@@ -19,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? _weatherData;
   String? _location;
   bool _isLoading = true;
+  String? _weatherErrorText; // To store error messages
 
   @override
   void initState() {
@@ -30,7 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchWeatherData() async {
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true;
+      _weatherErrorText = null; // Clear previous errors
     });
 
     try {
@@ -38,18 +40,16 @@ class _HomeScreenState extends State<HomeScreen> {
       final position = await _locationService.getCurrentLocation();
       final weatherData = await _weatherApiService.fetchWeather(position.latitude, position.longitude);
       
-      // Optionally, you might fetch location name based on coordinates
-      // For simplicity, use coordinates or a
-      // static location name for now if location name fetching is not implemented
-      _location = '${position.latitude}, ${position.longitude}';
+      _location = '${position.latitude}, ${position.longitude}'; // Use coordinates as location
       
       setState(() {
         _weatherData = weatherData;
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
       });
     } catch (error) {
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
+        _weatherErrorText = 'Could not fetch weather data. Please check your connection or location services and try again.';
       });
       print('Error fetching weather data: $error');
     }
@@ -121,7 +121,11 @@ Widget build(BuildContext context) {
                           rainfall: _weatherData!['currentConditions']['precip']?.toString() ?? '0',
                           pressure: _weatherData!['currentConditions']['pressure'].toString(),
                         )
-                      : const Text('Failed to load weather data'),
+                      : Text(
+                          _weatherErrorText ?? 'Failed to load weather data. Pull down to refresh.',
+                          style: TextStyle(color: Colors.red[700], fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
             ],
           ),
         ),
@@ -145,10 +149,11 @@ Widget build(BuildContext context) {
                             pressure: _weatherData!['currentConditions']['pressure'].toString(),
                             location: _location!,
                           )
-                        : const Text('No crop recommendations available'),
-               
-            
-                
+                        : Text( // Also display error for crop recommendations if weather data failed
+                            _weatherErrorText ?? 'Crop recommendations unavailable due to missing weather data.',
+                            style: TextStyle(color: Colors.orange[700], fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
               ],
             ),
           ),

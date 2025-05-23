@@ -1,51 +1,80 @@
 import 'dart:convert';
+import 'dart:typed_data'; // Added for Uint8List
 import 'package:farmerconnect/models/crop_detail.dart';
 import 'package:farmerconnect/models/cropreco.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiService {
   late GenerativeModel model;
 
-  GeminiService() {
-    const apiKey = 'AIzaSyCH6irwSysB1Osl_dnhQzh-LvwS_YHQ9Qg'; // Replace with your API key
-    if (apiKey.isEmpty) {
-      throw Exception('API Key is missing!');
-    }
+  // Private constructor
+  GeminiService._(String apiKey) {
     model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: apiKey,
     );
   }
 
+  // Static factory method for asynchronous initialization
+  static Future<GeminiService> create() async {
+    await dotenv.load(fileName: ".env");
+    final apiKey = dotenv.env['GEMINI_API_KEY'];
+
+    if (apiKey == null || apiKey.isEmpty) {
+      throw Exception('GEMINI_API_KEY is not set in the .env file');
+    }
+    return GeminiService._(apiKey);
+  }
+
   /// Method to fetch detailed information about a crop.
   Future<CropDetails> getCropDetails(String cropName, String location) async {
     try {
-      final prompt = 'Provide detailed information about the crop $cropName in $location, '
-          'including its optimal growth conditions, seasonality, care tips, '
-          'and any region-specific farming details relevant to $location.';
+      final prompt =
+          'Provide detailed information about the crop "$cropName" in "$location". '
+          'Return the response as a JSON object with the following keys: '
+          '"cropName" (string), "location" (string), "optimalConditions" (string), '
+          '"seasonality" (string), "careTips" (string), "regionSpecificDetails" (string), '
+          'and "description" (string, a general overview).';
 
-      // Send the prompt to the Gemini model and get the response
       final response = await model.generateContent([Content.text(prompt)]);
+      print('Generated Crop Details Raw Response: ${response.text}');
 
-      // Print the generated response to the console for debugging
-      print('Generated Crop Details Response: ${response.text}');
+      if (response.text == null || response.text!.trim().isEmpty) {
+        throw Exception('Received empty response from API for crop details.');
+      }
 
-      final details = response.text?.split('\n') ?? [];
+      String cleanedJsonString = response.text!;
+      if (cleanedJsonString.startsWith("```json")) {
+        cleanedJsonString = cleanedJsonString.substring(7);
+      }
+      if (cleanedJsonString.endsWith("```")) {
+        cleanedJsonString = cleanedJsonString.substring(0, cleanedJsonString.length - 3);
+      }
+      cleanedJsonString = cleanedJsonString.trim();
 
-      // Process response and extract relevant details
+      final Map<String, dynamic> jsonResponse = jsonDecode(cleanedJsonString) as Map<String, dynamic>;
+
       return CropDetails(
-        cropName: cropName,
-        location: location,
-        imageUrl: 'https://example.com/crop_image/$cropName.png', // Placeholder for crop image
-        description: details.isNotEmpty ? details.join(' ') : 'No description available',
-        season: 'Seasonal data for $location from API', // Modify as needed
-        tips: 'Generated farming tips for $cropName in $location.',
+        cropName: jsonResponse['cropName'] as String? ?? cropName,
+        location: jsonResponse['location'] as String? ?? location,
+        description: jsonResponse['description'] as String? ?? 'No description available.',
+        season: jsonResponse['seasonality'] as String? ?? 'N/A',
+        tips: jsonResponse['careTips'] as String? ?? 'N/A',
+        // You might want to combine optimalConditions and regionSpecificDetails into the description
+        // or handle them as separate fields in your CropDetails model if it's updated.
+        // For now, let's combine them into description or a general field.
+        // If CropDetails model is not updated, this example assumes they are part of description.
+        // optimalConditions: jsonResponse['optimalConditions'] as String? ?? 'N/A',
+        // regionSpecificDetails: jsonResponse['regionSpecificDetails'] as String? ?? 'N/A',
+        imageUrl: 'https://example.com/crop_image/${jsonResponse['cropName'] ?? cropName}.png', // Placeholder
       );
     } catch (e) {
-      // Print the error to the console for debugging
       print('Error in getCropDetails: $e');
-      throw Exception('Error fetching crop details: $e');
+      // Fallback or rethrow, depending on how you want to handle errors.
+      // For now, rethrowing to make it visible.
+      throw Exception('Error fetching or parsing crop details: $e');
     }
   }
 
@@ -67,6 +96,49 @@ Future<String> chatWithAI(String userInput) async {
     // Handle errors gracefully and print them for debugging
     print('Error in chatWithAI: $e');
     throw Exception('Error during chat interaction: $e');
+  }
+
+  /// Method to identify plant disease from an image.
+  Future<Map<String, dynamic>> identifyDiseaseFromImage(
+      Uint8List imageBytes, String? userLocation) async {
+    try {
+      final locationInfo = userLocation ?? 'not specified';
+      final prompt = [
+        Content.multi([
+          TextPart(
+              "Analyze the provided image of a plant. Identify any diseases present. For each identified disease, provide: 1. Disease name, 2. Symptoms observed, 3. Recommended treatments, 4. Preventative measures. If multiple diseases are present, list them all. Also, consider the location if provided: $locationInfo. Please return the response as a JSON object with a key 'diseaseInfo' which is a list of objects, each containing 'name', 'symptoms', 'treatment', and 'prevention'."),
+          DataPart('image/jpeg', imageBytes),
+        ])
+      ];
+
+      final response = await model.generateContent(prompt);
+
+      print('Generated Disease Identification Response: ${response.text}');
+
+      if (response.text == null || response.text!.isEmpty) {
+        throw Exception('Received empty response from API');
+      }
+
+      // Attempt to clean the response text if it's not valid JSON directly
+      String cleanedJsonString = response.text!;
+      if (cleanedJsonString.startsWith("```json")) {
+        cleanedJsonString = cleanedJsonString.substring(7);
+      }
+      if (cleanedJsonString.endsWith("```")) {
+        cleanedJsonString = cleanedJsonString.substring(0, cleanedJsonString.length - 3);
+      }
+      cleanedJsonString = cleanedJsonString.trim();
+
+      final decodedResponse = jsonDecode(cleanedJsonString) as Map<String, dynamic>;
+      return decodedResponse;
+    } catch (e) {
+      print('Error in identifyDiseaseFromImage: $e');
+      // Return a structured error response
+      return {
+        'error': 'Failed to identify disease. Please try again.',
+        'details': e.toString()
+      };
+    }
   }
 }
 Future<List<CropRecommendation>> getCropRecommendations({
@@ -90,80 +162,60 @@ Considering the weather conditions in $location:
 - Rainfall: $rainfall mm
 - Pressure: $pressure mb
 
-Please provide crop recommendations for this location, including:
-- Crop name
-- Yield
-- Harvest date
-
+Please provide crop recommendations for this location. Return the response as a JSON array, 
+where each object in the array has the following keys: "cropName" (string), 
+"yield" (string, e.g., "High", "Medium", "Low", or a specific value), and "harvestDate" (string, e.g., "90 days", "Mid-October").
 If any information is missing or unclear, provide default recommendations based on typical conditions for the given location and season.
 ''';
 
-    // Send the prompt to the Gemini model and get the response
     final response = await model.generateContent([Content.text(prompt)]);
-    
-    // Print the generated response to the console for debugging
-    print('Generated Crop Recommendations Response: ${response.text}');
+    print('Generated Crop Recommendations Raw Response: ${response.text}');
 
     if (response.text == null || response.text!.trim().isEmpty) {
-      print('No recommendations provided. Returning default recommendations.');
+      print('No recommendations provided by API. Returning default recommendations.');
       return _getDefaultRecommendations();
     }
 
-    final cropData = response.text!.split('\n');
+    String cleanedJsonString = response.text!;
+    if (cleanedJsonString.startsWith("```json")) {
+      cleanedJsonString = cleanedJsonString.substring(7);
+    }
+    if (cleanedJsonString.endsWith("```")) {
+      cleanedJsonString = cleanedJsonString.substring(0, cleanedJsonString.length - 3);
+    }
+    cleanedJsonString = cleanedJsonString.trim();
+    
+    final List<dynamic> jsonResponse = jsonDecode(cleanedJsonString) as List<dynamic>;
+    
+    if (jsonResponse.isEmpty) {
+      print('Parsed JSON recommendation list is empty. Returning default recommendations.');
+      return _getDefaultRecommendations();
+    }
+
     List<CropRecommendation> recommendations = [];
-    
-    String? cropName;
-    String? cropYield;
-    String? harvestDate;
-
-    for (var line in cropData) {
-      line = line.trim();
-
-      final cropMatch = RegExp(r'^\*\*\d+\.\s*(.*?)\s*\*\*').firstMatch(line);
-      if (cropMatch != null) {
-        if (cropName != null && cropYield != null && harvestDate != null) {
-          recommendations.add(CropRecommendation(
-            cropName: cropName,
-            crop_yield: cropYield,
-            harvestDate: harvestDate,
-            icon: _getCropIcon(cropName),
-          ));
-        }
-        cropName = cropMatch.group(1)?.trim();
-        cropYield = null;
-        harvestDate = null;
-        continue;
-      }
-
-      final yieldMatch = RegExp(r'\*\*Yield:\*\*\s*(.*)').firstMatch(line);
-      if (yieldMatch != null) {
-        cropYield = yieldMatch.group(1)?.trim();
-        continue;
-      }
-
-      final harvestDateMatch = RegExp(r'\*\*Harvest Date:\*\*\s*(.*)').firstMatch(line);
-      if (harvestDateMatch != null) {
-        harvestDate = harvestDateMatch.group(1)?.trim();
-        continue;
+    for (var item in jsonResponse) {
+      final Map<String, dynamic> cropMap = item as Map<String, dynamic>;
+      final cropName = cropMap['cropName'] as String?;
+      if (cropName != null) {
+        recommendations.add(CropRecommendation(
+          cropName: cropName,
+          crop_yield: cropMap['yield'] as String? ?? 'N/A',
+          harvestDate: cropMap['harvestDate'] as String? ?? 'N/A',
+          icon: _getCropIcon(cropName),
+        ));
       }
     }
-
-    // Add the last crop after the loop ends
-    if (cropName != null && cropYield != null && harvestDate != null) {
-      recommendations.add(CropRecommendation(
-        cropName: cropName,
-        crop_yield: cropYield,
-        harvestDate: harvestDate,
-        icon: _getCropIcon(cropName),
-      ));
+    
+    if (recommendations.isEmpty) {
+      print('No valid crop data parsed from JSON. Returning default recommendations.');
+      return _getDefaultRecommendations();
     }
 
-    print('Final Crop Recommendations: ${recommendations.map((r) => r.cropName).toList()}');
-    
+    print('Final Parsed Crop Recommendations: ${recommendations.map((r) => r.cropName).toList()}');
     return recommendations;
   } catch (e) {
-    print('Error in getCropRecommendations: $e');
-    return _getDefaultRecommendations();
+    print('Error in getCropRecommendations (parsing or API error): $e');
+    return _getDefaultRecommendations(); // Fallback to defaults on any error
   }
 }
 

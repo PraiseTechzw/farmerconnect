@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data'; // Added for Uint8List
 import 'package:farmerconnect/service/gemini_api.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,7 +14,7 @@ class FarmersAIScreen extends StatefulWidget {
 class _FarmersAIScreenState extends State<FarmersAIScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _inputController = TextEditingController();
-  final GeminiService _geminiService = GeminiService();
+  late final GeminiService _geminiService; // Make it late final
   XFile? _image;
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
@@ -33,6 +34,19 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+    // Initialize GeminiService using the factory
+    GeminiService.create().then((service) {
+      setState(() {
+        _geminiService = service;
+      });
+    }).catchError((error) {
+      // Handle error, e.g., show a snackbar or log
+      print("Failed to initialize GeminiService: $error");
+      // You might want to set a flag to disable AI features if initialization fails
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to initialize AI Service. Some features might not work. Error: $error')),
+      );
+    });
   }
 
   @override
@@ -60,15 +74,45 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
 
       String responseText = '';
 
+      if (!mounted) return; // Ensure widget is still mounted
+
       if (_image != null) {
-        final cropDetails = await _geminiService.getCropDetails('Uploaded Image Crop', 'Your Location');
-        responseText = cropDetails.description; // Update based on image analysis
+        final Uint8List imageBytes = await _image!.readAsBytes();
+        // Using null for location for now, as per instructions
+        final diseaseInfoMap = await _geminiService.identifyDiseaseFromImage(imageBytes, null);
+
+        if (diseaseInfoMap.containsKey('error')) {
+          responseText = "Error identifying disease: ${diseaseInfoMap['error']}\nDetails: ${diseaseInfoMap['details']}";
+        } else if (diseaseInfoMap.containsKey('diseaseInfo')) {
+          List<dynamic> diseases = diseaseInfoMap['diseaseInfo'] as List<dynamic>;
+          if (diseases.isEmpty) {
+            responseText = "No diseases identified or the image was unclear.";
+          } else {
+            StringBuffer sb = StringBuffer();
+            sb.writeln("Plant Disease Analysis:");
+            for (var disease in diseases) {
+              sb.writeln("\n**Disease:** ${disease['name'] ?? 'N/A'}");
+              sb.writeln("**Symptoms:** ${disease['symptoms'] ?? 'N/A'}");
+              sb.writeln("**Treatment:** ${disease['treatment'] ?? 'N/A'}");
+              sb.writeln("**Prevention:** ${disease['prevention'] ?? 'N/A'}");
+            }
+            responseText = sb.toString();
+          }
+        } else {
+          responseText = "Received an unexpected response format from the AI.";
+        }
+        // Clear the image after processing
+        setState(() {
+          _image = null; 
+        });
       } else if (userInput.isNotEmpty) {
         responseText = await _geminiService.chatWithAI(userInput);
       }
 
-      // Simulate a delay for the AI "thinking"
-      await Future.delayed(const Duration(seconds: 2));
+      // Simulate a delay for the AI "thinking" - can be removed if not desired
+      // await Future.delayed(const Duration(seconds: 1)); 
+
+      if (!mounted) return;
 
       // Add AI response to chat
       setState(() {
@@ -93,11 +137,52 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
   }
 
   Future<void> _pickImage() async {
-    final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _image = pickedImage;
-      _showIntro = false;
-    });
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Pick from Gallery'),
+                onTap: () {
+                  Navigator.of(context).pop(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Take a Photo'),
+                onTap: () {
+                  Navigator.of(context).pop(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (source != null) {
+      try {
+        final pickedImage = await _picker.pickImage(source: source);
+        if (pickedImage != null) {
+          setState(() {
+            _image = pickedImage;
+            _showIntro = false; // Hide intro text when an image is selected
+          });
+        }
+      } catch (e) {
+        // Handle potential errors during image picking (e.g., permission issues)
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error picking image: $e')),
+          );
+        }
+        print('Error picking image: $e');
+      }
+    }
   }
 
   @override
