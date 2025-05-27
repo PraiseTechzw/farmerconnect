@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:farmer_connect/screens/finance/reports_screen.dart';
+import 'package:farmer_connect/screens/finance/goals_screen.dart';
+import 'package:farmer_connect/screens/finance/budget_screen.dart';
+import 'package:farmer_connect/screens/finance/insights_screen.dart';
+import 'package:farmer_connect/screens/finance/transaction_detail_screen.dart';
 
 class FinanceScreen extends StatefulWidget {
   const FinanceScreen({super.key});
@@ -9,8 +13,64 @@ class FinanceScreen extends StatefulWidget {
   State<FinanceScreen> createState() => _FinanceScreenState();
 }
 
-class _FinanceScreenState extends State<FinanceScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _FinanceScreenState extends State<FinanceScreen> {
+  int _currentIndex = 0;
+  final currencyFormat = NumberFormat.currency(symbol: '\$');
+
+  final List<Widget> _screens = [
+    const OverviewScreen(),
+    const ReportsScreen(),
+    const GoalsScreen(),
+    const BudgetScreen(),
+    const InsightsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard),
+            label: 'Overview',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart),
+            label: 'Reports',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.flag),
+            label: 'Goals',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.account_balance_wallet),
+            label: 'Budget',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.lightbulb),
+            label: 'Insights',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OverviewScreen extends StatefulWidget {
+  const OverviewScreen({super.key});
+
+  @override
+  State<OverviewScreen> createState() => _OverviewScreenState();
+}
+
+class _OverviewScreenState extends State<OverviewScreen> {
   final currencyFormat = NumberFormat.currency(symbol: '\$');
 
   final List<Map<String, dynamic>> _recentTransactions = [
@@ -49,95 +109,72 @@ class _FinanceScreenState extends State<FinanceScreen> with SingleTickerProvider
       'icon': Icons.water_drop,
     },
     {
-      'title': 'Greenhouse Expansion',
+      'title': 'Farm Expansion',
       'target': 15000.00,
       'current': 8000.00,
       'deadline': '2024-12-31',
-      'icon': Icons.greenhouse,
+      'icon': Icons.agriculture,
     },
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              expandedHeight: 200,
-              pinned: true,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.green[700]!,
-                        Colors.green[500]!,
-                      ],
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const SizedBox(height: 40),
-                      const Text(
-                        'Farm Finance',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildFinancialOverview(),
-                      const SizedBox(height: 16),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 200,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.green[700]!,
+                      Colors.green[500]!,
                     ],
                   ),
                 ),
-              ),
-              bottom: TabBar(
-                controller: _tabController,
-                indicatorColor: Colors.white,
-                indicatorWeight: 3,
-                labelStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const SizedBox(height: 40),
+                    const Text(
+                      'Farm Finance',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildFinancialOverview(),
+                    const SizedBox(height: 16),
+                  ],
                 ),
-                tabs: const [
-                  Tab(text: 'Overview'),
-                  Tab(text: 'Transactions'),
-                  Tab(text: 'Goals'),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildRecentTransactions(),
+                  const SizedBox(height: 24),
+                  _buildFinancialGoals(),
                 ],
               ),
             ),
-          ];
-        },
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildOverviewTab(),
-            _buildTransactionsTab(),
-            _buildGoalsTab(),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          _showAddTransactionDialog();
+          _showAddTransactionDialog(context);
         },
         icon: const Icon(Icons.add),
         label: const Text('New Transaction'),
@@ -206,211 +243,43 @@ class _FinanceScreenState extends State<FinanceScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildOverviewTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildMonthlyChart(),
-          const SizedBox(height: 24),
-          _buildExpenseBreakdown(),
-          const SizedBox(height: 24),
-          _buildUpcomingPayments(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMonthlyChart() {
-    return Container(
-      height: 300,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Monthly Overview',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: [
-                      const FlSpot(0, 3),
-                      const FlSpot(1, 1),
-                      const FlSpot(2, 4),
-                      const FlSpot(3, 2),
-                      const FlSpot(4, 5),
-                      const FlSpot(5, 3),
-                    ],
-                    isCurved: true,
-                    color: Colors.green[700],
-                    barWidth: 3,
-                    dotData: FlDotData(show: false),
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: Colors.green[100],
-                    ),
-                  ),
-                ],
+  Widget _buildRecentTransactions() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recent Transactions',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExpenseBreakdown() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Expense Breakdown',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            TextButton(
+              onPressed: () {
+                // Navigate to transactions screen
+              },
+              child: const Text('View All'),
             ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 200,
-            child: PieChart(
-              PieChartData(
-                sections: [
-                  PieChartSectionData(
-                    value: 40,
-                    title: 'Equipment',
-                    color: Colors.blue[400],
-                    radius: 50,
-                  ),
-                  PieChartSectionData(
-                    value: 30,
-                    title: 'Supplies',
-                    color: Colors.green[400],
-                    radius: 50,
-                  ),
-                  PieChartSectionData(
-                    value: 20,
-                    title: 'Labor',
-                    color: Colors.orange[400],
-                    radius: 50,
-                  ),
-                  PieChartSectionData(
-                    value: 10,
-                    title: 'Other',
-                    color: Colors.red[400],
-                    radius: 50,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 3,
+          itemBuilder: (context, index) {
+            return _buildTransactionCard(index);
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildUpcomingPayments() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Upcoming Payments',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.green[100],
-                  child: Icon(Icons.payment, color: Colors.green[700]),
-                ),
-                title: Text('Payment ${index + 1}'),
-                subtitle: Text('Due in ${index + 1} days'),
-                trailing: Text(
-                  currencyFormat.format(500.00),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTransactionsTab() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _recentTransactions.length,
-      itemBuilder: (context, index) {
-        final transaction = _recentTransactions[index];
-        return _buildTransactionCard(transaction);
-      },
-    );
-  }
-
-  Widget _buildTransactionCard(Map<String, dynamic> transaction) {
+  Widget _buildTransactionCard(int index) {
+    final transaction = _recentTransactions[index];
     final isIncome = transaction['type'] == 'income';
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -447,22 +316,57 @@ class _FinanceScreenState extends State<FinanceScreen> with SingleTickerProvider
             ),
           ],
         ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TransactionDetailScreen(
+                transaction: transaction,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildGoalsTab() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _financialGoals.length,
-      itemBuilder: (context, index) {
-        final goal = _financialGoals[index];
-        return _buildGoalCard(goal);
-      },
+  Widget _buildFinancialGoals() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Financial Goals',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // Navigate to goals screen
+              },
+              child: const Text('View All'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _financialGoals.length,
+          itemBuilder: (context, index) {
+            return _buildGoalCard(index);
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildGoalCard(Map<String, dynamic> goal) {
+  Widget _buildGoalCard(int index) {
+    final goal = _financialGoals[index];
     final progress = goal['current'] / goal['target'];
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -537,7 +441,7 @@ class _FinanceScreenState extends State<FinanceScreen> with SingleTickerProvider
     );
   }
 
-  void _showAddTransactionDialog() {
+  void _showAddTransactionDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

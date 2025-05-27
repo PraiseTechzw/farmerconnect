@@ -6,7 +6,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/marketplace/marketplace_screen.dart';
 import 'screens/farm/farm_management_screen.dart';
 import 'screens/community/community_screen.dart';
-import 'screens/financial/financial_screen.dart';
+import 'screens/finance/finance_screen.dart';
 import 'providers/crop_provider.dart';
 
 void main() {
@@ -54,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
     const MarketplaceScreen(),
     const FarmManagementScreen(),
     const CommunityScreen(),
-    const FinancialScreen(),
+    const FinanceScreen(),
   ];
 
   @override

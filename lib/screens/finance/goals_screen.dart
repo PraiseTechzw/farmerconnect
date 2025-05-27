@@ -26,7 +26,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
       'current': 12500.00,
       'deadline': DateTime(2024, 8, 31),
       'category': 'Infrastructure',
-      'icon': Icons.greenhouse,
+      'icon': Icons.home_work,
     },
     {
       'title': 'Emergency Fund',
