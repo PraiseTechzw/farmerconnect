@@ -31,9 +31,9 @@ jobs:
 
       - name: Check formatting
         run: |
-          if [[ -n $(git status -s) ]]; then
+          if [[ -n $(git status -s | grep -v "pubspec.lock" | grep -E "\.dart$") ]]; then
             echo "::error::Code formatting issues found. Please run 'dart format .' locally and commit the changes."
-            git diff
+            git diff -- "*.dart"
             exit 1
           fi
 
