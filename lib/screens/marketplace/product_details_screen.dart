@@ -200,16 +200,26 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   String _getProductDescription(String productName) {
     final descriptions = {
-      'Organic Wheat Seeds': 'High-quality organic wheat seeds perfect for sustainable farming. These seeds are certified organic and have a high germination rate. Ideal for both small-scale and large-scale farming operations.',
-      'Premium Fertilizer': 'Advanced formula fertilizer that provides essential nutrients for optimal plant growth. Contains balanced NPK ratio and micronutrients for healthy crop development.',
-      'Tractor Attachment': 'Versatile tractor attachment compatible with most standard tractor models. Made from high-quality materials for durability and long-lasting performance.',
-      'Garden Tools Set': 'Complete set of essential gardening tools including trowel, pruner, rake, and more. Ergonomic design for comfortable use during long gardening sessions.',
-      'Organic Pesticide': 'Natural and eco-friendly pesticide that effectively controls pests while being safe for plants and the environment. Made from organic ingredients.',
-      'Drip Irrigation Kit': 'Efficient water-saving irrigation system that delivers water directly to plant roots. Includes all necessary components for easy installation.',
-      'Hybrid Corn Seeds': 'High-yield hybrid corn seeds with excellent disease resistance. Perfect for maximizing crop production in various climate conditions.',
-      'Pruning Shears': 'Professional-grade pruning shears with sharp, durable blades. Comfortable grip and precise cutting for perfect pruning results.',
-      'Soil Testing Kit': 'Comprehensive soil testing kit that measures pH, nitrogen, phosphorus, and potassium levels. Essential for maintaining optimal soil conditions.',
-      'Chicken Feed': 'Nutritionally balanced feed for healthy chicken growth and egg production. Contains essential vitamins and minerals for poultry health.',
+      'Organic Wheat Seeds':
+          'High-quality organic wheat seeds perfect for sustainable farming. These seeds are certified organic and have a high germination rate. Ideal for both small-scale and large-scale farming operations.',
+      'Premium Fertilizer':
+          'Advanced formula fertilizer that provides essential nutrients for optimal plant growth. Contains balanced NPK ratio and micronutrients for healthy crop development.',
+      'Tractor Attachment':
+          'Versatile tractor attachment compatible with most standard tractor models. Made from high-quality materials for durability and long-lasting performance.',
+      'Garden Tools Set':
+          'Complete set of essential gardening tools including trowel, pruner, rake, and more. Ergonomic design for comfortable use during long gardening sessions.',
+      'Organic Pesticide':
+          'Natural and eco-friendly pesticide that effectively controls pests while being safe for plants and the environment. Made from organic ingredients.',
+      'Drip Irrigation Kit':
+          'Efficient water-saving irrigation system that delivers water directly to plant roots. Includes all necessary components for easy installation.',
+      'Hybrid Corn Seeds':
+          'High-yield hybrid corn seeds with excellent disease resistance. Perfect for maximizing crop production in various climate conditions.',
+      'Pruning Shears':
+          'Professional-grade pruning shears with sharp, durable blades. Comfortable grip and precise cutting for perfect pruning results.',
+      'Soil Testing Kit':
+          'Comprehensive soil testing kit that measures pH, nitrogen, phosphorus, and potassium levels. Essential for maintaining optimal soil conditions.',
+      'Chicken Feed':
+          'Nutritionally balanced feed for healthy chicken growth and egg production. Contains essential vitamins and minerals for poultry health.',
     };
     return descriptions[productName] ?? 'No description available.';
   }
@@ -278,25 +288,28 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ],
     };
 
-    final specs = specifications[productName] ?? ['No specifications available'];
+    final specs =
+        specifications[productName] ?? ['No specifications available'];
     return Column(
-      children: specs.map((spec) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Row(
-          children: [
-            Icon(
-              Icons.check_circle,
-              color: Colors.green[700],
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              spec,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      )).toList(),
+      children: specs
+          .map((spec) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.green[700],
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      spec,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ))
+          .toList(),
     );
   }
 
@@ -360,4 +373,4 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
     );
   }
-} 
+}

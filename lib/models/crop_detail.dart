@@ -10,7 +10,8 @@ class CropDetails {
     required this.imageUrl,
     required this.description,
     required this.season,
-    required this.tips, required String location,
+    required this.tips,
+    required String location,
   });
 
   // Factory constructor to parse from JSON
@@ -20,7 +21,8 @@ class CropDetails {
       imageUrl: json['imageUrl'],
       description: json['description'],
       season: json['season'],
-      tips: json['tips'], location: 'Chinhoyi',
+      tips: json['tips'],
+      location: 'Chinhoyi',
     );
   }
 }

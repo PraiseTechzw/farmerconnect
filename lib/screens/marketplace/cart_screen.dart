@@ -31,7 +31,8 @@ class _CartScreenState extends State<CartScreen> {
   ];
 
   double get _subtotal {
-    return _cartItems.fold(0, (sum, item) => sum + (item['price'] * item['quantity']));
+    return _cartItems.fold(
+        0, (sum, item) => sum + (item['price'] * item['quantity']));
   }
 
   double get _shipping => 10.0;
@@ -220,4 +221,4 @@ class _CartScreenState extends State<CartScreen> {
       ],
     );
   }
-} 
+}

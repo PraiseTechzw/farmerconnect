@@ -87,7 +87,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildAnalyticsCard(String title, String value, IconData icon, Color color) {
+  Widget _buildAnalyticsCard(
+      String title, String value, IconData icon, Color color) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -151,7 +152,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildYieldItem(String crop, String area, String prediction, double confidence) {
+  Widget _buildYieldItem(
+      String crop, String area, String prediction, double confidence) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -207,7 +209,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 Text(
                   '${(confidence * 100).toInt()}%',
                   style: TextStyle(
-                    color: confidence > 0.8 ? Colors.green[700] : Colors.orange[700],
+                    color: confidence > 0.8
+                        ? Colors.green[700]
+                        : Colors.orange[700],
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -243,7 +247,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildFinancialItem('Revenue', '\$12,500', '+15%', Colors.green),
+                _buildFinancialItem(
+                    'Revenue', '\$12,500', '+15%', Colors.green),
                 const Divider(),
                 _buildFinancialItem('Expenses', '\$8,200', '-5%', Colors.red),
                 const Divider(),
@@ -256,7 +261,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildFinancialItem(String title, String amount, String change, Color changeColor) {
+  Widget _buildFinancialItem(
+      String title, String amount, String change, Color changeColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -350,4 +356,4 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       ],
     );
   }
-} 
+}

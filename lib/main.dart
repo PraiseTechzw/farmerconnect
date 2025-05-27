@@ -30,7 +30,8 @@ class FarmerConnectApp extends StatelessWidget {
             title: 'FarmerConnect',
             theme: lightTheme,
             darkTheme: darkTheme,
-            themeMode: themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+            themeMode:
+                themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             home: const MainScreen(),
           );
         },

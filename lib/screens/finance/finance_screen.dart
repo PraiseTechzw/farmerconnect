@@ -212,7 +212,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
   }
 
-  Widget _buildOverviewCard(String title, String amount, IconData icon, Color color) {
+  Widget _buildOverviewCard(
+      String title, String amount, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -510,4 +511,4 @@ class _OverviewScreenState extends State<OverviewScreen> {
       ),
     );
   }
-} 
+}

@@ -161,7 +161,8 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     );
   }
 
-  Widget _buildInteractionButton(IconData icon, String label, VoidCallback onTap) {
+  Widget _buildInteractionButton(
+      IconData icon, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: Row(
@@ -334,4 +335,4 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       ),
     );
   }
-} 
+}

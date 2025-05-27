@@ -8,7 +8,8 @@ class ReportsScreen extends StatefulWidget {
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProviderStateMixin {
+class _ReportsScreenState extends State<ReportsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final currencyFormat = NumberFormat.currency(symbol: '\$');
 
@@ -206,7 +207,8 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildSummaryCard(String title, String amount, IconData icon, Color color) {
+  Widget _buildSummaryCard(
+      String title, String amount, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -528,7 +530,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               Text(
                 '${(profitMargin * 100).toStringAsFixed(1)}%',
                 style: TextStyle(
-                  color: profitMargin > 0.5 ? Colors.green[700] : Colors.orange[700],
+                  color: profitMargin > 0.5
+                      ? Colors.green[700]
+                      : Colors.orange[700],
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -580,7 +584,8 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildTrendCard(String title, String description, IconData icon, Color color) {
+  Widget _buildTrendCard(
+      String title, String description, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -626,4 +631,4 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       ),
     );
   }
-} 
+}

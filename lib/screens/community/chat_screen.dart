@@ -23,12 +23,14 @@ class _ChatScreenState extends State<ChatScreen> {
       'time': '10:31 AM',
     },
     {
-      'content': 'I\'m doing great! I wanted to ask about your organic farming techniques.',
+      'content':
+          'I\'m doing great! I wanted to ask about your organic farming techniques.',
       'isMe': false,
       'time': '10:32 AM',
     },
     {
-      'content': 'Sure! I\'d be happy to share my experience with organic farming.',
+      'content':
+          'Sure! I\'d be happy to share my experience with organic farming.',
       'isMe': true,
       'time': '10:33 AM',
     },
@@ -210,4 +212,4 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
-} 
+}

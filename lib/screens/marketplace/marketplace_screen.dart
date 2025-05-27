@@ -10,7 +10,8 @@ class MarketplaceScreen extends StatefulWidget {
   State<MarketplaceScreen> createState() => _MarketplaceScreenState();
 }
 
-class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTickerProviderStateMixin {
+class _MarketplaceScreenState extends State<MarketplaceScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'All';
@@ -90,7 +91,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
                               borderRadius: BorderRadius.circular(30),
                               borderSide: BorderSide.none,
                             ),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 0),
                           ),
                         ),
                       ),
@@ -212,7 +214,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(12)),
                   color: Colors.grey[200],
                 ),
                 child: Center(
@@ -346,4 +349,4 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
     ];
     return products[index % products.length];
   }
-} 
+}

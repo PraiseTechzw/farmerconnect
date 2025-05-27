@@ -169,13 +169,17 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: item['status'] == 'Operational' ? Colors.green[100] : Colors.orange[100],
+                  color: item['status'] == 'Operational'
+                      ? Colors.green[100]
+                      : Colors.orange[100],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   item['status'] as String,
                   style: TextStyle(
-                    color: item['status'] == 'Operational' ? Colors.green[700] : Colors.orange[700],
+                    color: item['status'] == 'Operational'
+                        ? Colors.green[700]
+                        : Colors.orange[700],
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -340,4 +344,4 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
       ),
     );
   }
-} 
+}

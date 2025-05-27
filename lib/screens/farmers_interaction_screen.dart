@@ -61,8 +61,10 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
       String responseText = '';
 
       if (_image != null) {
-        final cropDetails = await _geminiService.getCropDetails('Uploaded Image Crop', 'Your Location');
-        responseText = cropDetails.description; // Update based on image analysis
+        final cropDetails = await _geminiService.getCropDetails(
+            'Uploaded Image Crop', 'Your Location');
+        responseText =
+            cropDetails.description; // Update based on image analysis
       } else if (userInput.isNotEmpty) {
         responseText = await _geminiService.chatWithAI(userInput);
       }
@@ -104,7 +106,8 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Farmer AI', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        title: const Text('Farmer AI',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.green[800],
         elevation: 0,
         centerTitle: true,
@@ -133,7 +136,10 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
                     children: [
                       Text(
                         'Welcome to Farmer AI!',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple),
                       ),
                       SizedBox(height: 10),
                       Text(
@@ -182,7 +188,8 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.file(File(_image!.path), height: 150, width: 150, fit: BoxFit.cover),
+                child: Image.file(File(_image!.path),
+                    height: 150, width: 150, fit: BoxFit.cover),
               ),
             ),
           if (_isLoading)
@@ -199,23 +206,30 @@ class _FarmersAIScreenState extends State<FarmersAIScreen>
   // Helper function to build chat bubbles with avatars
   Widget _buildChatBubble(String text, bool isUserMessage) {
     final avatar = isUserMessage
-        ? const CircleAvatar(child: Icon(Icons.person, color: Colors.white), backgroundColor: Colors.deepPurple)
-        : const CircleAvatar(child: Icon(Icons.android, color: Colors.white), backgroundColor: Colors.orange);
+        ? const CircleAvatar(
+            child: Icon(Icons.person, color: Colors.white),
+            backgroundColor: Colors.deepPurple)
+        : const CircleAvatar(
+            child: Icon(Icons.android, color: Colors.white),
+            backgroundColor: Colors.orange);
 
     return Align(
       alignment: isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
-          mainAxisAlignment: isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment:
+              isUserMessage ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             if (!isUserMessage) avatar,
             const SizedBox(width: 10),
             Container(
-              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+              constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.7),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isUserMessage ? Colors.deepPurple : Colors.deepOrangeAccent,
+                color:
+                    isUserMessage ? Colors.deepPurple : Colors.deepOrangeAccent,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(

@@ -7,18 +7,21 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<Map<String, dynamic>> _posts = [
     {
-      'content': 'Just harvested my first organic tomatoes! The yield is amazing this year.',
+      'content':
+          'Just harvested my first organic tomatoes! The yield is amazing this year.',
       'likes': 24,
       'comments': 8,
       'time': '2 hours ago',
       'image': 'assets/images/tomatoes.jpg',
     },
     {
-      'content': 'Looking for advice on sustainable irrigation methods. Any recommendations?',
+      'content':
+          'Looking for advice on sustainable irrigation methods. Any recommendations?',
       'likes': 15,
       'comments': 12,
       'time': '5 hours ago',
@@ -214,7 +217,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           ),
           if (post['image'] != null) ...[
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(bottom: Radius.circular(16)),
               child: Image.asset(
                 post['image'],
                 height: 200,
@@ -347,4 +351,4 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       ),
     );
   }
-} 
+}

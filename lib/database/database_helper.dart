@@ -247,4 +247,4 @@ class DatabaseHelper {
       whereArgs: ['Maintenance Due'],
     );
   }
-} 
+}

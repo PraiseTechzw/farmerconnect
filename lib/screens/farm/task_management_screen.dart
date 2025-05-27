@@ -143,7 +143,8 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
             margin: const EdgeInsets.only(bottom: 16),
             child: ExpansionTile(
               leading: CircleAvatar(
-                backgroundColor: _getPriorityColor(task['priority'] as String).withOpacity(0.1),
+                backgroundColor: _getPriorityColor(task['priority'] as String)
+                    .withOpacity(0.1),
                 child: Icon(
                   _getTaskIcon(task['category'] as String),
                   color: _getPriorityColor(task['priority'] as String),
@@ -168,7 +169,8 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(task['status'] as String).withOpacity(0.1),
+                  color: _getStatusColor(task['status'] as String)
+                      .withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -413,7 +415,8 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                 labelText: 'Description',
                 border: OutlineInputBorder(),
               ),
-              controller: TextEditingController(text: task['description'] as String),
+              controller:
+                  TextEditingController(text: task['description'] as String),
               maxLines: 3,
             ),
             const SizedBox(height: 16),
@@ -422,7 +425,8 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
                 labelText: 'Due Date',
                 border: OutlineInputBorder(),
               ),
-              controller: TextEditingController(text: task['dueDate'] as String),
+              controller:
+                  TextEditingController(text: task['dueDate'] as String),
               readOnly: true,
               onTap: () async {
                 final date = await showDatePicker(
@@ -613,4 +617,4 @@ class _TaskManagementScreenState extends State<TaskManagementScreen> {
       ),
     );
   }
-} 
+}

@@ -10,7 +10,8 @@ class CommunityScreen extends StatefulWidget {
   State<CommunityScreen> createState() => _CommunityScreenState();
 }
 
-class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProviderStateMixin {
+class _CommunityScreenState extends State<CommunityScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<Map<String, dynamic>> _featuredEvents = [
     {
@@ -33,7 +34,8 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     {
       'author': 'John Smith',
       'avatar': 'J',
-      'content': 'Just harvested my first organic tomatoes! The yield is amazing this year.',
+      'content':
+          'Just harvested my first organic tomatoes! The yield is amazing this year.',
       'likes': 24,
       'comments': 8,
       'time': '2 hours ago',
@@ -42,7 +44,8 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     {
       'author': 'Maria Garcia',
       'avatar': 'M',
-      'content': 'Looking for advice on sustainable irrigation methods. Any recommendations?',
+      'content':
+          'Looking for advice on sustainable irrigation methods. Any recommendations?',
       'likes': 15,
       'comments': 12,
       'time': '5 hours ago',
@@ -248,7 +251,8 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
             if (post['image'] != null) ...[
               const SizedBox(height: 8),
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(16)),
                 child: Image.asset(
                   post['image'],
                   height: 200,
@@ -348,7 +352,8 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
               child: Image.asset(
                 event['image'],
                 height: 200,
@@ -587,4 +592,4 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
       ),
     );
   }
-} 
+}

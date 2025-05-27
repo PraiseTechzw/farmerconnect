@@ -27,7 +27,8 @@ class CropRecommendationWidget extends StatefulWidget {
   });
 
   @override
-  _CropRecommendationWidgetState createState() => _CropRecommendationWidgetState();
+  _CropRecommendationWidgetState createState() =>
+      _CropRecommendationWidgetState();
 }
 
 class _CropRecommendationWidgetState extends State<CropRecommendationWidget> {
@@ -99,7 +100,7 @@ class _CropRecommendationWidgetState extends State<CropRecommendationWidget> {
   Widget _buildSkeletonLoading() {
     return ListView.builder(
       shrinkWrap: true,
-      itemCount: 5,  // Number of skeleton items
+      itemCount: 5, // Number of skeleton items
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 10.0),

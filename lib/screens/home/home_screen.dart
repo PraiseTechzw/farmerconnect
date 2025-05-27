@@ -35,9 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final position = await _locationService.getCurrentLocation();
-      final weatherData = await _weatherApiService.fetchWeather(position.latitude, position.longitude);
+      final weatherData = await _weatherApiService.fetchWeather(
+          position.latitude, position.longitude);
       _location = '${position.latitude}, ${position.longitude}';
-      
+
       setState(() {
         _weatherData = weatherData;
         _isLoading = false;
@@ -51,10 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('FarmerConnect'),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('FarmerConnect'),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -98,7 +99,7 @@ Widget build(BuildContext context) {
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(16),
-            child: Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -124,7 +125,8 @@ Widget build(BuildContext context) {
                   ],
                 ),
                 Icon(
-                  _getWeatherIcon(_weatherData?['currentConditions']['conditions']),
+                  _getWeatherIcon(
+                      _weatherData?['currentConditions']['conditions']),
                   size: 48,
                   color: Colors.orange,
                 ),
@@ -134,14 +136,18 @@ Widget build(BuildContext context) {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildWeatherInfo('Temperature', '${_weatherData?['currentConditions']['temp']}°C'),
-                _buildWeatherInfo('Humidity', '${_weatherData?['currentConditions']['humidity']}%'),
-                _buildWeatherInfo('Wind', '${_weatherData?['currentConditions']['windspeed']} km/h'),
+                _buildWeatherInfo('Temperature',
+                    '${_weatherData?['currentConditions']['temp']}°C'),
+                _buildWeatherInfo('Humidity',
+                    '${_weatherData?['currentConditions']['humidity']}%'),
+                _buildWeatherInfo('Wind',
+                    '${_weatherData?['currentConditions']['windspeed']} km/h'),
               ],
             ),
             const SizedBox(height: 16),
             Text(
-              _getWeatherForecast(_weatherData?['currentConditions']['conditions']),
+              _getWeatherForecast(
+                  _weatherData?['currentConditions']['conditions']),
               style: const TextStyle(
                 fontSize: 14,
               ),
@@ -154,7 +160,7 @@ Widget build(BuildContext context) {
 
   IconData _getWeatherIcon(String? condition) {
     if (condition == null) return Icons.wb_sunny;
-    
+
     condition = condition.toLowerCase();
     if (condition.contains('rain')) return Icons.grain;
     if (condition.contains('cloud')) return Icons.cloud;
@@ -165,7 +171,7 @@ Widget build(BuildContext context) {
 
   String _getWeatherForecast(String? condition) {
     if (condition == null) return 'Weather data unavailable';
-    
+
     condition = condition.toLowerCase();
     if (condition.contains('rain')) {
       return 'Rain expected. Consider protecting your crops and postponing outdoor activities.';
@@ -364,7 +370,7 @@ Widget build(BuildContext context) {
       'Soybeans': Icons.spa,
       'Cotton': Icons.filter_drama,
     };
-    
+
     final cropName = _getCropName(index);
     return cropIcons[cropName] ?? Icons.agriculture;
   }
@@ -512,11 +518,11 @@ Widget build(BuildContext context) {
                 ),
               );
             },
-        ),
-      ],
-    ),
-  );
-}
+          ),
+        ],
+      ),
+    );
+  }
 
   IconData _getActivityIcon(int index) {
     final icons = [

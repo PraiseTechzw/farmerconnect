@@ -5,7 +5,11 @@ class CropCard extends StatelessWidget {
   final String yieldInfo;
   final IconData icon;
 
-  const CropCard({super.key, required this.cropName, required this.yieldInfo, required this.icon});
+  const CropCard(
+      {super.key,
+      required this.cropName,
+      required this.yieldInfo,
+      required this.icon});
 
   @override
   Widget build(BuildContext context) {

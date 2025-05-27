@@ -221,7 +221,8 @@ class SellerProfileScreen extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
                 color: Colors.grey[200],
               ),
               child: Center(
@@ -263,4 +264,4 @@ class SellerProfileScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

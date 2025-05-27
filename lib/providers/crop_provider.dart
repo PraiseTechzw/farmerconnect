@@ -15,7 +15,8 @@ class CropProvider with ChangeNotifier {
       image: 'assets/corn.png',
       plantingInstructions: 'Sow corn seeds 1-2 inches deep...',
       yield: 'Up to 20 ears per plant',
-      wateringSchedule: 'Ensure consistent moisture, especially during tasseling.',
+      wateringSchedule:
+          'Ensure consistent moisture, especially during tasseling.',
     ),
     Crop(
       name: 'Potato',

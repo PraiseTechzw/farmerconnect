@@ -133,7 +133,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -320,7 +321,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       daysLeft.toString(),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: daysLeft < 30 ? Colors.red[700] : Colors.green[700],
+                        color:
+                            daysLeft < 30 ? Colors.red[700] : Colors.green[700],
                       ),
                     ),
                   ],
@@ -361,7 +363,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Delete Goal', style: TextStyle(color: Colors.red)),
+              title: const Text('Delete Goal',
+                  style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteConfirmation(goal);
@@ -436,4 +439,4 @@ class _GoalsScreenState extends State<GoalsScreen> {
       ),
     );
   }
-} 
+}

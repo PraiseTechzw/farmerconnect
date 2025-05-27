@@ -116,7 +116,8 @@ class WeatherCard extends StatelessWidget {
               children: [
                 _buildWeatherInfoCard('Wind', '$windSpeed km/h', Icons.air),
                 _buildWeatherInfoCard('Humidity', '$humidity%', Icons.opacity),
-                _buildWeatherInfoCard('Rainfall', '$rainfall mm', Icons.beach_access),
+                _buildWeatherInfoCard(
+                    'Rainfall', '$rainfall mm', Icons.beach_access),
               ],
             ),
           ],

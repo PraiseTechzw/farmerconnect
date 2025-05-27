@@ -8,7 +8,8 @@ class BudgetScreen extends StatefulWidget {
   State<BudgetScreen> createState() => _BudgetScreenState();
 }
 
-class _BudgetScreenState extends State<BudgetScreen> with SingleTickerProviderStateMixin {
+class _BudgetScreenState extends State<BudgetScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final currencyFormat = NumberFormat.currency(symbol: '\$');
 
@@ -190,7 +191,8 @@ class _BudgetScreenState extends State<BudgetScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildSummaryCard(String title, String amount, IconData icon, Color color) {
+  Widget _buildSummaryCard(
+      String title, String amount, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -266,7 +268,8 @@ class _BudgetScreenState extends State<BudgetScreen> with SingleTickerProviderSt
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: (category['color'] as Color).withOpacity(0.1),
+                  backgroundColor:
+                      (category['color'] as Color).withOpacity(0.1),
                   child: Icon(
                     category['icon'] as IconData,
                     color: category['color'] as Color,
@@ -322,7 +325,8 @@ class _BudgetScreenState extends State<BudgetScreen> with SingleTickerProviderSt
             LinearProgressIndicator(
               value: progress,
               backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(category['color'] as Color),
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(category['color'] as Color),
               minHeight: 8,
               borderRadius: BorderRadius.circular(4),
             ),
@@ -457,7 +461,8 @@ class _BudgetScreenState extends State<BudgetScreen> with SingleTickerProviderSt
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Delete Category', style: TextStyle(color: Colors.red)),
+              title: const Text('Delete Category',
+                  style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 _showDeleteConfirmation(category);
@@ -483,7 +488,8 @@ class _BudgetScreenState extends State<BudgetScreen> with SingleTickerProviderSt
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete Category'),
-          content: Text('Are you sure you want to delete "${category['name']}"?'),
+          content:
+              Text('Are you sure you want to delete "${category['name']}"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -503,4 +509,4 @@ class _BudgetScreenState extends State<BudgetScreen> with SingleTickerProviderSt
       },
     );
   }
-} 
+}

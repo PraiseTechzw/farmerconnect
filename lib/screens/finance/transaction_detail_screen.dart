@@ -7,7 +7,8 @@ class TransactionDetailScreen extends StatefulWidget {
   const TransactionDetailScreen({super.key, required this.transaction});
 
   @override
-  State<TransactionDetailScreen> createState() => _TransactionDetailScreenState();
+  State<TransactionDetailScreen> createState() =>
+      _TransactionDetailScreenState();
 }
 
 class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
@@ -151,11 +152,13 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           const SizedBox(height: 12),
           _buildDetailRow('Date', widget.transaction['date']),
           const SizedBox(height: 12),
-          _buildDetailRow('Type', widget.transaction['type'].toString().toUpperCase()),
+          _buildDetailRow(
+              'Type', widget.transaction['type'].toString().toUpperCase()),
           const SizedBox(height: 12),
           _buildDetailRow('Status', 'Completed'),
           const SizedBox(height: 12),
-          _buildDetailRow('Reference', '#TRX${widget.transaction['date'].replaceAll('-', '')}'),
+          _buildDetailRow('Reference',
+              '#TRX${widget.transaction['date'].replaceAll('-', '')}'),
         ],
       ),
     );
@@ -265,7 +268,8 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   labelText: 'Title',
                   border: OutlineInputBorder(),
                 ),
-                controller: TextEditingController(text: widget.transaction['title']),
+                controller:
+                    TextEditingController(text: widget.transaction['title']),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -287,8 +291,10 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 ),
                 value: widget.transaction['category'],
                 items: const [
-                  DropdownMenuItem(value: 'Crop Sales', child: Text('Crop Sales')),
-                  DropdownMenuItem(value: 'Equipment', child: Text('Equipment')),
+                  DropdownMenuItem(
+                      value: 'Crop Sales', child: Text('Crop Sales')),
+                  DropdownMenuItem(
+                      value: 'Equipment', child: Text('Equipment')),
                   DropdownMenuItem(value: 'Supplies', child: Text('Supplies')),
                 ],
                 onChanged: (value) {},
@@ -311,4 +317,4 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       ),
     );
   }
-} 
+}

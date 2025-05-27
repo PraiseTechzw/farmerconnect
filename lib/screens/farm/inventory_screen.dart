@@ -169,13 +169,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: item['status'] == 'In Stock' ? Colors.green[100] : Colors.orange[100],
+                  color: item['status'] == 'In Stock'
+                      ? Colors.green[100]
+                      : Colors.orange[100],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   item['status'] as String,
                   style: TextStyle(
-                    color: item['status'] == 'In Stock' ? Colors.green[700] : Colors.orange[700],
+                    color: item['status'] == 'In Stock'
+                        ? Colors.green[700]
+                        : Colors.orange[700],
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -188,7 +192,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   Widget _buildLowStockItems() {
-    final lowStockItems = _inventoryItems.where((item) => item['status'] == 'Low Stock').toList();
+    final lowStockItems =
+        _inventoryItems.where((item) => item['status'] == 'Low Stock').toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +223,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text('Current: ${item['quantity']} • Min: ${item['minQuantity']}'),
+              subtitle: Text(
+                  'Current: ${item['quantity']} • Min: ${item['minQuantity']}'),
               trailing: ElevatedButton(
                 onPressed: () {
                   _showReorderDialog(item);
@@ -334,4 +340,4 @@ class _InventoryScreenState extends State<InventoryScreen> {
       ),
     );
   }
-} 
+}

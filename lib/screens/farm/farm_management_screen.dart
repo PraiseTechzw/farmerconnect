@@ -14,7 +14,8 @@ class FarmManagementScreen extends StatefulWidget {
   State<FarmManagementScreen> createState() => _FarmManagementScreenState();
 }
 
-class _FarmManagementScreenState extends State<FarmManagementScreen> with SingleTickerProviderStateMixin {
+class _FarmManagementScreenState extends State<FarmManagementScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<Map<String, dynamic>> _quickStats = [
     {
@@ -185,7 +186,8 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CropPlanningScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const CropPlanningScreen()),
             );
           },
         ),
@@ -221,7 +223,8 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const TaskManagementScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const TaskManagementScreen()),
             );
           },
         ),
@@ -276,7 +279,8 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
         ListTile(
           leading: const Icon(Icons.analytics, color: Colors.teal),
           title: const Text('Farm Analytics'),
-          subtitle: const Text('View performance, yield, and financial metrics.'),
+          subtitle:
+              const Text('View performance, yield, and financial metrics.'),
           trailing: const Icon(Icons.arrow_forward_ios),
           onTap: () {
             Navigator.push(

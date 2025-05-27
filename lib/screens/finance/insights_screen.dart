@@ -14,21 +14,24 @@ class _InsightsScreenState extends State<InsightsScreen> {
   final List<Map<String, dynamic>> _insights = [
     {
       'title': 'Cost Optimization',
-      'description': 'Your equipment maintenance costs are 15% higher than similar farms. Consider preventive maintenance to reduce long-term costs.',
+      'description':
+          'Your equipment maintenance costs are 15% higher than similar farms. Consider preventive maintenance to reduce long-term costs.',
       'type': 'cost',
       'icon': Icons.trending_down,
       'color': Colors.red,
     },
     {
       'title': 'Revenue Opportunity',
-      'description': 'Market prices for tomatoes are expected to rise by 20% in the next quarter. Consider increasing production.',
+      'description':
+          'Market prices for tomatoes are expected to rise by 20% in the next quarter. Consider increasing production.',
       'type': 'revenue',
       'icon': Icons.trending_up,
       'color': Colors.green,
     },
     {
       'title': 'Efficiency Improvement',
-      'description': 'Your water usage efficiency is below average. Implementing drip irrigation could save up to 30% on water costs.',
+      'description':
+          'Your water usage efficiency is below average. Implementing drip irrigation could save up to 30% on water costs.',
       'type': 'efficiency',
       'icon': Icons.water_drop,
       'color': Colors.blue,
@@ -146,7 +149,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -233,7 +237,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: (insight['color'] as Color).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -313,7 +318,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isUp
                         ? Colors.green[100]
@@ -475,4 +481,4 @@ class _InsightsScreenState extends State<InsightsScreen> {
       ),
     );
   }
-} 
+}
