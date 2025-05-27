@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:farmer_connect/screens/community/post_detail_screen.dart';
+import 'package:farmer_connect/screens/community/event_detail_screen.dart';
+import 'package:farmer_connect/screens/community/chat_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -204,78 +207,93 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.green[700],
-              child: Text(
-                post['avatar'],
-                style: const TextStyle(color: Colors.white),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PostDetailScreen(post: post),
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.green[700],
+                child: Text(
+                  post['avatar'],
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              title: Text(
+                post['author'],
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(post['time']),
+              trailing: IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () {
+                  // Show post options
+                },
               ),
             ),
-            title: Text(
-              post['author'],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(post['content']),
+            ),
+            if (post['image'] != null) ...[
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                child: Image.asset(
+                  post['image'],
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            subtitle: Text(post['time']),
-            trailing: IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {
-                // Show post options
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(post['content']),
-          ),
-          if (post['image'] != null) ...[
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-              child: Image.asset(
-                post['image'],
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            ],
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  _buildActionButton(
+                    Icons.thumb_up_outlined,
+                    '${post['likes']}',
+                    () {
+                      // Handle like
+                    },
+                  ),
+                  const SizedBox(width: 16),
+                  _buildActionButton(
+                    Icons.comment_outlined,
+                    '${post['comments']}',
+                    () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PostDetailScreen(post: post),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 16),
+                  _buildActionButton(
+                    Icons.share_outlined,
+                    'Share',
+                    () {
+                      // Handle share
+                    },
+                  ),
+                ],
               ),
             ),
           ],
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                _buildActionButton(
-                  Icons.thumb_up_outlined,
-                  '${post['likes']}',
-                  () {
-                    // Handle like
-                  },
-                ),
-                const SizedBox(width: 16),
-                _buildActionButton(
-                  Icons.comment_outlined,
-                  '${post['comments']}',
-                  () {
-                    // Handle comment
-                  },
-                ),
-                const SizedBox(width: 16),
-                _buildActionButton(
-                  Icons.share_outlined,
-                  'Share',
-                  () {
-                    // Handle share
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -317,72 +335,87 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.asset(
-              event['image'],
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EventDetailScreen(event: event),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  event['title'],
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today, size: 16),
-                    const SizedBox(width: 8),
-                    Text(event['date']),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, size: 16),
-                    const SizedBox(width: 8),
-                    Text(event['location']),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.people, size: 16),
-                    const SizedBox(width: 8),
-                    Text('${event['attendees']} attending'),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle event registration
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[700],
-                    minimumSize: const Size(double.infinity, 45),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: Image.asset(
+                event['image'],
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event['title'],
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  child: const Text('Register Now'),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_today, size: 16),
+                      const SizedBox(width: 8),
+                      Text(event['date']),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, size: 16),
+                      const SizedBox(width: 8),
+                      Text(event['location']),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.people, size: 16),
+                      const SizedBox(width: 8),
+                      Text('${event['attendees']} attending'),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EventDetailScreen(event: event),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[700],
+                      minimumSize: const Size(double.infinity, 45),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Register Now'),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -452,17 +485,38 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
         ),
         title: const Text('Farmer Name'),
         subtitle: const Text('Specializes in Organic Farming'),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Handle connection request
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[700],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.message_outlined),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      user: {
+                        'name': 'Farmer Name',
+                        'avatar': 'F',
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
-          child: const Text('Connect'),
+            ElevatedButton(
+              onPressed: () {
+                // Handle connection request
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[700],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text('Connect'),
+            ),
+          ],
         ),
       ),
     );
