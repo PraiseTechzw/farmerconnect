@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'constants/theme/themes_notifier.dart';
 import 'screens/home/home_screen.dart';
+import 'screens/marketplace/marketplace_screen.dart';
+import 'screens/farm_management/farm_management_screen.dart';
+import 'screens/community/community_screen.dart';
+import 'screens/financial/financial_screen.dart';
 import 'providers/crop_provider.dart';
-
 
 void main() {
   runApp(const FarmerConnectApp());
@@ -28,13 +31,66 @@ class FarmerConnectApp extends StatelessWidget {
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            initialRoute: '/',
-            routes: {
-              '/': (context) => const HomeScreen(),
-            
-            },
+            home: const MainScreen(),
           );
         },
+      ),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+    const HomeScreen(),
+    const MarketplaceScreen(),
+    const FarmManagementScreen(),
+    const CommunityScreen(),
+    const FinancialScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.store),
+            label: 'Marketplace',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.agriculture),
+            label: 'Farm',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Community',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet),
+            label: 'Financial',
+          ),
+        ],
       ),
     );
   }
