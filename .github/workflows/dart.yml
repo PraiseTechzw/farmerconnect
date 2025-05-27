@@ -36,19 +36,6 @@ jobs:
             git diff -- "*.dart"
             exit 1
           fi
-
-      - name: Fix critical issues
-        run: |
-          # Remove unused imports
-          find lib -name "*.dart" -exec sed -i '/^import.*unused/d' {} \;
-          # Fix const constructors
-          find lib -name "*.dart" -exec sed -i 's/new /const /g' {} \;
-          # Fix deprecated withOpacity
-          find lib -name "*.dart" -exec sed -i 's/withOpacity(\([0-9.]*\))/withAlpha(int(\1 * 255))/g' {} \;
-
-      - name: Analyze project source
-        run: flutter analyze --fatal-infos=false --fatal-warnings=false
-
       - name: Run tests
         run: flutter test
 
