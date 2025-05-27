@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:farmer_connect/screens/marketplace/product_details_screen.dart';
+import 'package:farmer_connect/screens/marketplace/cart_screen.dart';
+import 'package:farmer_connect/screens/marketplace/filter_screen.dart';
 
 class MarketplaceScreen extends StatefulWidget {
   const MarketplaceScreen({super.key});
@@ -46,6 +49,19 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
               expandedHeight: 200,
               floating: false,
               pinned: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.shopping_cart),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CartScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: BoxDecoration(
@@ -113,9 +129,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            _isFilterOpen = !_isFilterOpen;
-          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FilterScreen(),
+            ),
+          );
         },
         child: const Icon(Icons.filter_list),
       ),
@@ -173,81 +192,91 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> with SingleTicker
 
   Widget _buildProductCard(int index) {
     final product = _getProductDetails(index);
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                color: Colors.grey[200],
-              ),
-              child: Center(
-                child: Icon(
-                  product['icon'] as IconData,
-                  size: 50,
-                  color: Colors.green[700],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(product: product),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  color: Colors.grey[200],
+                ),
+                child: Center(
+                  child: Icon(
+                    product['icon'] as IconData,
+                    size: 50,
+                    color: Colors.green[700],
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product['name'] as String,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  product['category'] as String,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      product['price'] as String,
-                      style: TextStyle(
-                        color: Colors.green[700],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product['name'] as String,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.green[100],
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Icon(
-                        Icons.shopping_cart,
-                        size: 16,
-                        color: Colors.green[700],
-                      ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    product['category'] as String,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        product['price'] as String,
+                        style: TextStyle(
+                          color: Colors.green[700],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.green[100],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Icon(
+                          Icons.shopping_cart,
+                          size: 16,
+                          color: Colors.green[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
