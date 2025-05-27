@@ -339,7 +339,7 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
         'title': 'Harvest Soybeans',
         'date': 'Next Week',
         'priority': 'Low',
-        'icon': Icons.harvest,
+        'icon': Icons.agriculture,
       },
     ];
 
@@ -518,7 +518,7 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
         'name': 'Harvester',
         'status': 'Operational',
         'lastMaintenance': '3 weeks ago',
-        'icon': Icons.harvest,
+        'icon': Icons.agriculture,
       },
     ];
 
@@ -711,7 +711,7 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
       {
         'title': 'Wheat Harvested',
         'time': '2 hours ago',
-        'icon': Icons.harvest,
+        'icon': Icons.agriculture,
         'color': Colors.green,
       },
       {
