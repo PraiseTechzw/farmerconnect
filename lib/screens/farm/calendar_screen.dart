@@ -49,7 +49,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         children: [
           TableCalendar(
             firstDay: DateTime.utc(2024, 1, 1),
-            lastDay: DateTime.utc(2024, 12, 31),
+            lastDay: DateTime.utc(2025, 12, 31),
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
             selectedDayPredicate: (day) {
