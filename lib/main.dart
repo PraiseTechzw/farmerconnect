@@ -1,4 +1,4 @@
-import 'package:farmerconnect/constants/theme/theme.dart';
+import 'package:farmer_connect/constants/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'constants/theme/themes_notifier.dart';

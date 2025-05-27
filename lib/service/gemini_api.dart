@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:farmerconnect/models/crop_detail.dart';
-import 'package:farmerconnect/models/cropreco.dart';
+import 'package:farmer_connect/models/crop_detail.dart';
+import 'package:farmer_connect/models/cropreco.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 

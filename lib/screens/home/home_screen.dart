@@ -1,10 +1,10 @@
-import 'package:farmerconnect/screens/farmers_interaction_screen.dart';
+import 'package:farmer_connect/screens/farmers_interaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:farmerconnect/service/location_services.dart';
-import 'package:farmerconnect/service/weather_service.dart';
-import 'package:farmerconnect/widgets/weather_card.dart';
-import 'package:farmerconnect/widgets/crop_recomm.dart'; // Ensure this widget can accept location
+import 'package:farmer_connect/service/location_services.dart';
+import 'package:farmer_connect/service/weather_service.dart';
+import 'package:farmer_connect/widgets/weather_card.dart';
+import 'package:farmer_connect/widgets/crop_recomm.dart'; // Ensure this widget can accept location
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:farmerconnect/service/gemini_api.dart';
+import 'package:farmer_connect/service/gemini_api.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 

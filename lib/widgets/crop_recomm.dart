@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:farmerconnect/models/cropreco.dart';
-import 'package:farmerconnect/screens/details/crop_details_screen.dart';
-import 'package:farmerconnect/service/gemini_api.dart';
+import 'package:farmer_connect/models/cropreco.dart';
+import 'package:farmer_connect/screens/details/crop_details_screen.dart';
+import 'package:farmer_connect/service/gemini_api.dart';
 
 class CropRecommendationWidget extends StatefulWidget {
   final String temperature;

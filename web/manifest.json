@@ -1,6 +1,6 @@
 {
-    "name": "farmerconnect",
-    "short_name": "farmerconnect",
+    "name": "farmer_connect",
+    "short_name": "farmer_connect",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

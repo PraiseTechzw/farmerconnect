@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:farmerconnect/models/crop_detail.dart';
-import 'package:farmerconnect/models/cropreco.dart';
-import 'package:farmerconnect/service/gemini_api.dart';
+import 'package:farmer_connect/models/crop_detail.dart';
+import 'package:farmer_connect/models/cropreco.dart';
+import 'package:farmer_connect/service/gemini_api.dart';
 
 class CropDetailScreen extends StatelessWidget {
   final CropRecommendation crop;

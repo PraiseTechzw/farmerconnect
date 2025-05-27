@@ -27,10 +27,7 @@ class LocationService {
     // Get the current position
     try {
       return await Geolocator.getCurrentPosition(
-        locationSettings:  AndroidSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 10,
-        ),
+        desiredAccuracy: LocationAccuracy.high,
       );
     } catch (e) {
       throw Exception('Error getting location: $e');
