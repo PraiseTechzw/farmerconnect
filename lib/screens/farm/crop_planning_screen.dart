@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:farmer_connect/database/database_helper.dart';
+import 'package:farmer_connect/screens/farm/calendar_screen.dart';
 
 class CropPlanningScreen extends StatefulWidget {
   const CropPlanningScreen({super.key});
@@ -8,35 +10,197 @@ class CropPlanningScreen extends StatefulWidget {
 }
 
 class _CropPlanningScreenState extends State<CropPlanningScreen> {
-  final List<Map<String, dynamic>> _crops = [
-    {
-      'name': 'Wheat',
-      'area': '5 acres',
-      'plantingDate': '2024-03-15',
-      'harvestDate': '2024-07-15',
-      'status': 'Growing',
-      'progress': 0.7,
-      'icon': Icons.grain,
-    },
-    {
-      'name': 'Corn',
-      'area': '3 acres',
-      'plantingDate': '2024-04-01',
-      'harvestDate': '2024-08-15',
-      'status': 'Growing',
-      'progress': 0.4,
-      'icon': Icons.eco,
-    },
-    {
-      'name': 'Soybeans',
-      'area': '4 acres',
-      'plantingDate': '2024-04-15',
-      'harvestDate': '2024-09-01',
-      'status': 'Growing',
-      'progress': 0.6,
-      'icon': Icons.spa,
-    },
-  ];
+  final DatabaseHelper _databaseHelper = DatabaseHelper();
+  List<Map<String, dynamic>> _crops = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCrops();
+  }
+
+  Future<void> _loadCrops() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final crops = await _databaseHelper.getCrops();
+      setState(() {
+        _crops = crops;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading crops: $e')),
+      );
+    }
+  }
+
+  Future<void> _addCrop(Map<String, dynamic> crop) async {
+    try {
+      await _databaseHelper.insertCrop(crop);
+      await _loadCrops();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Crop added successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error adding crop: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _updateCrop(Map<String, dynamic> crop) async {
+    try {
+      await _databaseHelper.updateCrop(crop);
+      await _loadCrops();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Crop updated successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating crop: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteCrop(int id) async {
+    try {
+      await _databaseHelper.deleteCrop(id);
+      await _loadCrops();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Crop deleted successfully')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting crop: $e')),
+        );
+      }
+    }
+  }
+
+  void _showAddCropDialog() {
+    final nameController = TextEditingController();
+    final areaController = TextEditingController();
+    DateTime? plantingDate;
+    DateTime? harvestDate;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add New Crop'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Crop Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: areaController,
+                decoration: const InputDecoration(
+                  labelText: 'Area (acres)',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                title: const Text('Planting Date'),
+                subtitle: Text(plantingDate?.toString() ?? 'Not selected'),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (date != null) {
+                    plantingDate = date;
+                    setState(() {});
+                  }
+                },
+              ),
+              ListTile(
+                title: const Text('Expected Harvest Date'),
+                subtitle: Text(harvestDate?.toString() ?? 'Not selected'),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now().add(const Duration(days: 90)),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (date != null) {
+                    harvestDate = date;
+                    setState(() {});
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.isEmpty ||
+                  areaController.text.isEmpty ||
+                  plantingDate == null ||
+                  harvestDate == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please fill in all fields'),
+                  ),
+                );
+                return;
+              }
+
+              final crop = {
+                'name': nameController.text,
+                'area': areaController.text,
+                'plantingDate': plantingDate!.toIso8601String(),
+                'harvestDate': harvestDate!.toIso8601String(),
+                'status': 'Planned',
+                'progress': 0.0,
+                'icon': '🌱',
+              };
+
+              _addCrop(crop);
+              Navigator.pop(context);
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,20 +221,20 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildCropSchedule(),
-          const SizedBox(height: 24),
-          _buildUpcomingTasks(),
-          const SizedBox(height: 24),
-          _buildWeatherForecast(),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildCropSchedule(),
+                const SizedBox(height: 24),
+                _buildUpcomingTasks(),
+                const SizedBox(height: 24),
+                _buildWeatherForecast(),
+              ],
+            ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddCropDialog();
-        },
+        onPressed: _showAddCropDialog,
         child: const Icon(Icons.add),
       ),
     );
@@ -88,82 +252,97 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        ..._crops.map((crop) {
-          return Card(
-            margin: const EdgeInsets.only(bottom: 16),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.green[100],
-                child: Icon(
-                  crop['icon'] as IconData,
-                  color: Colors.green[700],
-                ),
-              ),
-              title: Text(
-                crop['name'] as String,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Area: ${crop['area']}'),
-                  Text('Planting: ${crop['plantingDate']}'),
-                  Text('Harvest: ${crop['harvestDate']}'),
-                ],
-              ),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    crop['status'] as String,
-                    style: TextStyle(
-                      color: Colors.green[700],
-                      fontWeight: FontWeight.bold,
+        ..._crops.map((crop) => Card(
+              margin: const EdgeInsets.only(bottom: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          crop['name'],
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${crop['area']} acres',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  SizedBox(
-                    width: 100,
-                    child: LinearProgressIndicator(
-                      value: crop['progress'] as double,
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Planting: ${crop['plantingDate']}'),
+                        Text('Harvest: ${crop['harvestDate']}'),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    LinearProgressIndicator(
+                      value: crop['progress'],
                       backgroundColor: Colors.grey[200],
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green[700]!),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        _getStatusColor(crop['status']),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Status: ${crop['status']}',
+                          style: TextStyle(
+                            color: _getStatusColor(crop['status']),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                // TODO: Implement edit functionality
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                _deleteCrop(crop['id']);
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }).toList(),
+            )),
       ],
     );
   }
 
-  Widget _buildUpcomingTasks() {
-    final tasks = [
-      {
-        'title': 'Fertilize Wheat Field',
-        'date': 'Tomorrow',
-        'priority': 'High',
-        'icon': Icons.agriculture,
-      },
-      {
-        'title': 'Irrigate Corn Field',
-        'date': 'Today',
-        'priority': 'Medium',
-        'icon': Icons.water_drop,
-      },
-      {
-        'title': 'Harvest Soybeans',
-        'date': 'Next Week',
-        'priority': 'Low',
-        'icon': Icons.agriculture,
-      },
-    ];
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'planned':
+        return Colors.blue;
+      case 'in progress':
+        return Colors.orange;
+      case 'completed':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
 
+  Widget _buildUpcomingTasks() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -175,44 +354,30 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        ...tasks.map((task) {
-          return Card(
-            margin: const EdgeInsets.only(bottom: 16),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.orange[100],
-                child: Icon(
-                  task['icon'] as IconData,
-                  color: Colors.orange[700],
-                ),
-              ),
-              title: Text(
-                task['title'] as String,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: Text(task['date'] as String),
-              trailing: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.orange[100],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  task['priority'] as String,
-                  style: TextStyle(
-                    color: Colors.orange[700],
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.agriculture),
+            title: const Text('Harvest Wheat'),
+            subtitle: const Text('Due in 2 days'),
+            trailing: const Chip(
+              label: Text('High'),
+              backgroundColor: Colors.red,
+              labelStyle: TextStyle(color: Colors.white),
             ),
-          );
-        }).toList(),
+          ),
+        ),
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.water_drop),
+            title: const Text('Irrigation System Maintenance'),
+            subtitle: const Text('Due in 5 days'),
+            trailing: const Chip(
+              label: Text('Medium'),
+              backgroundColor: Colors.orange,
+              labelStyle: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -237,56 +402,22 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Current',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(Icons.wb_sunny, size: 32),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  '25°C',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'Sunny',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+                    const Text(
+                      'Current Weather',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    Row(
                       children: [
+                        const Icon(Icons.wb_sunny),
+                        const SizedBox(width: 8),
                         Text(
-                          'Humidity: 65%',
+                          '25°C',
                           style: TextStyle(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Text(
-                          'Wind: 10 km/h',
-                          style: TextStyle(
-                            color: Colors.grey[600],
+                            fontSize: 18,
+                            color: Colors.orange[700],
                           ),
                         ),
                       ],
@@ -294,16 +425,14 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Divider(),
-                const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildForecastDay('Mon', Icons.wb_sunny, '28°C'),
-                    _buildForecastDay('Tue', Icons.cloud, '25°C'),
-                    _buildForecastDay('Wed', Icons.water_drop, '22°C'),
-                    _buildForecastDay('Thu', Icons.wb_sunny, '26°C'),
-                    _buildForecastDay('Fri', Icons.cloud, '24°C'),
+                    _buildWeatherDay('Mon', '☀️', '28°C'),
+                    _buildWeatherDay('Tue', '⛅', '26°C'),
+                    _buildWeatherDay('Wed', '🌧️', '24°C'),
+                    _buildWeatherDay('Thu', '⛅', '25°C'),
+                    _buildWeatherDay('Fri', '☀️', '27°C'),
                   ],
                 ),
               ],
@@ -314,7 +443,7 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
     );
   }
 
-  Widget _buildForecastDay(String day, IconData icon, String temp) {
+  Widget _buildWeatherDay(String day, String emoji, String temp) {
     return Column(
       children: [
         Text(
@@ -324,94 +453,13 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Icon(icon),
+        Text(
+          emoji,
+          style: const TextStyle(fontSize: 24),
+        ),
         const SizedBox(height: 8),
         Text(temp),
       ],
-    );
-  }
-
-  void _showAddCropDialog() {
-    DateTime? selectedPlantingDate;
-    DateTime? selectedHarvestDate;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Crop'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Crop Name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Area (acres)',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Planting Date',
-                border: OutlineInputBorder(),
-              ),
-              readOnly: true,
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365)),
-                );
-                if (date != null) {
-                  selectedPlantingDate = date;
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Expected Harvest Date',
-                border: OutlineInputBorder(),
-              ),
-              readOnly: true,
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now().add(const Duration(days: 120)),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365)),
-                );
-                if (date != null) {
-                  selectedHarvestDate = date;
-                }
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Add crop
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
     );
   }
 } 
