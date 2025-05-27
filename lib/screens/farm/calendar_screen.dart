@@ -12,28 +12,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-
   final Map<DateTime, List<Map<String, dynamic>>> _events = {
     DateTime.now(): [
       {
         'title': 'Harvest Wheat',
-        'type': 'task',
-        'color': Colors.green,
         'icon': Icons.agriculture,
-      },
-      {
-        'title': 'Irrigation System Maintenance',
-        'type': 'maintenance',
-        'color': Colors.blue,
-        'icon': Icons.water_drop,
+        'color': Colors.orange,
       },
     ],
     DateTime.now().add(const Duration(days: 2)): [
       {
-        'title': 'Plant Corn',
-        'type': 'task',
-        'color': Colors.orange,
-        'icon': Icons.grass,
+        'title': 'Irrigation System Maintenance',
+        'icon': Icons.water_drop,
+        'color': Colors.blue,
       },
     ],
   };
@@ -50,9 +41,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
-              _showAddEventDialog();
-            },
+            onPressed: () => _showAddEventDialog(),
           ),
         ],
       ),
@@ -78,64 +67,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
               });
             },
             eventLoader: _getEventsForDay,
-            calendarStyle: CalendarStyle(
-              markersMaxCount: 3,
+            calendarStyle: const CalendarStyle(
+              markersMaxCount: 1,
               markerDecoration: BoxDecoration(
-                color: Colors.blue[700],
+                color: Colors.blue,
                 shape: BoxShape.circle,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const Divider(),
           Expanded(
-            child: _buildEventList(),
+            child: _selectedDay == null
+                ? const Center(child: Text('Select a day to view events'))
+                : ListView.builder(
+                    itemCount: _getEventsForDay(_selectedDay!).length,
+                    itemBuilder: (context, index) {
+                      final event = _getEventsForDay(_selectedDay!)[index];
+                      return ListTile(
+                        leading: Icon(event['icon'], color: event['color']),
+                        title: Text(event['title']),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () => _showEditEventDialog(event),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildEventList() {
-    if (_selectedDay == null) return const SizedBox();
-
-    final events = _getEventsForDay(_selectedDay!);
-    if (events.isEmpty) {
-      return const Center(
-        child: Text('No events for this day'),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: events.length,
-      itemBuilder: (context, index) {
-        final event = events[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: (event['color'] as Color).withOpacity(0.1),
-              child: Icon(
-                event['icon'] as IconData,
-                color: event['color'] as Color,
-              ),
-            ),
-            title: Text(
-              event['title'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(event['type'] as String),
-            trailing: IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () {
-                _showEditEventDialog(event);
-              },
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -150,54 +110,44 @@ class _CalendarScreenState extends State<CalendarScreen> {
             TextField(
               decoration: const InputDecoration(
                 labelText: 'Event Title',
-                border: OutlineInputBorder(),
               ),
+              onChanged: (value) {
+                // Handle title input
+              },
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
+            DropdownButtonFormField<IconData>(
               decoration: const InputDecoration(
                 labelText: 'Event Type',
-                border: OutlineInputBorder(),
               ),
               items: const [
                 DropdownMenuItem(
-                  value: 'task',
-                  child: Text('Task'),
-                ),
-                DropdownMenuItem(
-                  value: 'maintenance',
-                  child: Text('Maintenance'),
-                ),
-                DropdownMenuItem(
-                  value: 'harvest',
+                  value: Icons.agriculture,
                   child: Text('Harvest'),
                 ),
+                DropdownMenuItem(
+                  value: Icons.water_drop,
+                  child: Text('Irrigation'),
+                ),
+                DropdownMenuItem(
+                  value: Icons.engineering,
+                  child: Text('Maintenance'),
+                ),
               ],
-              onChanged: (value) {},
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Date',
-                border: OutlineInputBorder(),
-              ),
-              readOnly: true,
-              onTap: () {
-                // Show date picker
+              onChanged: (value) {
+                // Handle icon selection
               },
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
-              // Add event
+              // Handle event creation
               Navigator.pop(context);
             },
             child: const Text('Add'),
@@ -218,48 +168,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
             TextField(
               decoration: const InputDecoration(
                 labelText: 'Event Title',
-                border: OutlineInputBorder(),
               ),
-              controller: TextEditingController(text: event['title'] as String),
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: 'Event Type',
-                border: OutlineInputBorder(),
-              ),
-              value: event['type'] as String,
-              items: const [
-                DropdownMenuItem(
-                  value: 'task',
-                  child: Text('Task'),
-                ),
-                DropdownMenuItem(
-                  value: 'maintenance',
-                  child: Text('Maintenance'),
-                ),
-                DropdownMenuItem(
-                  value: 'harvest',
-                  child: Text('Harvest'),
-                ),
-              ],
-              onChanged: (value) {},
+              controller: TextEditingController(text: event['title']),
+              onChanged: (value) {
+                // Handle title update
+              },
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
-              // Update event
+              // Handle event update
               Navigator.pop(context);
             },
-            child: const Text('Update'),
+            child: const Text('Save'),
           ),
         ],
       ),

@@ -3,6 +3,9 @@ import 'package:farmer_connect/screens/farm/crop_planning_screen.dart';
 import 'package:farmer_connect/screens/farm/inventory_screen.dart';
 import 'package:farmer_connect/screens/farm/equipment_screen.dart';
 import 'package:farmer_connect/screens/farm/analytics_screen.dart';
+import 'package:farmer_connect/screens/farm/weather_screen.dart';
+import 'package:farmer_connect/screens/farm/calendar_screen.dart';
+import 'package:farmer_connect/screens/farm/task_management_screen.dart';
 
 class FarmManagementScreen extends StatefulWidget {
   const FarmManagementScreen({super.key});
@@ -107,10 +110,10 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
         body: TabBarView(
           controller: _tabController,
           children: [
-            _buildCropsTab(),
-            _buildInventoryTab(),
-            _buildEquipmentTab(),
-            _buildAnalyticsTab(),
+            _buildCropsTab(context),
+            _buildInventoryTab(context),
+            _buildEquipmentTab(context),
+            _buildAnalyticsTab(context),
           ],
         ),
       ),
@@ -170,586 +173,119 @@ class _FarmManagementScreenState extends State<FarmManagementScreen> with Single
     );
   }
 
-  Widget _buildCropsTab() {
+  Widget _buildCropsTab(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildSectionHeader('Active Crops', 'View All'),
-        const SizedBox(height: 16),
-        _buildCropList(),
-        const SizedBox(height: 24),
-        _buildSectionHeader('Upcoming Tasks', 'View All'),
-        const SizedBox(height: 16),
-        _buildTaskList(),
+        ListTile(
+          leading: const Icon(Icons.grass, color: Colors.green),
+          title: const Text('Crop Planning'),
+          subtitle: const Text('Manage crop schedules, planting, and harvest.'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CropPlanningScreen()),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.calendar_today, color: Colors.blue),
+          title: const Text('Calendar View'),
+          subtitle: const Text('Visualize farm events and tasks.'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CalendarScreen()),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.cloud, color: Colors.lightBlue),
+          title: const Text('Weather Information'),
+          subtitle: const Text('Detailed weather data for your farm.'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WeatherScreen()),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.task, color: Colors.purple),
+          title: const Text('Task Management'),
+          subtitle: const Text('Create, assign, and track farm tasks.'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TaskManagementScreen()),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildInventoryTab() {
+  Widget _buildInventoryTab(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildSectionHeader('Inventory Items', 'View All'),
-        const SizedBox(height: 16),
-        _buildInventoryList(),
-        const SizedBox(height: 24),
-        _buildSectionHeader('Low Stock Items', 'View All'),
-        const SizedBox(height: 16),
-        _buildLowStockList(),
+        ListTile(
+          leading: const Icon(Icons.inventory, color: Colors.orange),
+          title: const Text('Inventory Management'),
+          subtitle: const Text('Track supplies, stock levels, and reordering.'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const InventoryScreen()),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildEquipmentTab() {
+  Widget _buildEquipmentTab(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildSectionHeader('Equipment', 'View All'),
-        const SizedBox(height: 16),
-        _buildEquipmentList(),
-        const SizedBox(height: 24),
-        _buildSectionHeader('Maintenance Schedule', 'View All'),
-        const SizedBox(height: 16),
-        _buildMaintenanceList(),
+        ListTile(
+          leading: const Icon(Icons.agriculture, color: Colors.blue),
+          title: const Text('Equipment Management'),
+          subtitle: const Text('Track machinery, maintenance, and usage.'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const EquipmentScreen()),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildAnalyticsTab() {
+  Widget _buildAnalyticsTab(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildSectionHeader('Farm Overview', 'View Details'),
-        const SizedBox(height: 16),
-        _buildAnalyticsCards(),
-        const SizedBox(height: 24),
-        _buildSectionHeader('Recent Activities', 'View All'),
-        const SizedBox(height: 16),
-        _buildActivityList(),
-      ],
-    );
-  }
-
-  Widget _buildSectionHeader(String title, String action) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        TextButton(
-          onPressed: () {},
-          child: Text(action),
+        ListTile(
+          leading: const Icon(Icons.analytics, color: Colors.teal),
+          title: const Text('Farm Analytics'),
+          subtitle: const Text('View performance, yield, and financial metrics.'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
+            );
+          },
         ),
       ],
-    );
-  }
-
-  Widget _buildCropList() {
-    final crops = [
-      {
-        'name': 'Wheat',
-        'area': '5 acres',
-        'status': 'Growing',
-        'progress': 0.7,
-        'icon': Icons.grain,
-      },
-      {
-        'name': 'Corn',
-        'area': '3 acres',
-        'status': 'Growing',
-        'progress': 0.4,
-        'icon': Icons.eco,
-      },
-      {
-        'name': 'Soybeans',
-        'area': '4 acres',
-        'status': 'Growing',
-        'progress': 0.6,
-        'icon': Icons.spa,
-      },
-    ];
-
-    return Column(
-      children: crops.map((crop) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.green[100],
-              child: Icon(
-                crop['icon'] as IconData,
-                color: Colors.green[700],
-              ),
-            ),
-            title: Text(
-              crop['name'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(crop['area'] as String),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  crop['status'] as String,
-                  style: TextStyle(
-                    color: Colors.green[700],
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                SizedBox(
-                  width: 100,
-                  child: LinearProgressIndicator(
-                    value: crop['progress'] as double,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green[700]!),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildTaskList() {
-    final tasks = [
-      {
-        'title': 'Fertilize Wheat Field',
-        'date': 'Tomorrow',
-        'priority': 'High',
-        'icon': Icons.agriculture,
-      },
-      {
-        'title': 'Irrigate Corn Field',
-        'date': 'Today',
-        'priority': 'Medium',
-        'icon': Icons.water_drop,
-      },
-      {
-        'title': 'Harvest Soybeans',
-        'date': 'Next Week',
-        'priority': 'Low',
-        'icon': Icons.agriculture,
-      },
-    ];
-
-    return Column(
-      children: tasks.map((task) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.orange[100],
-              child: Icon(
-                task['icon'] as IconData,
-                color: Colors.orange[700],
-              ),
-            ),
-            title: Text(
-              task['title'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(task['date'] as String),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.orange[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                task['priority'] as String,
-                style: TextStyle(
-                  color: Colors.orange[700],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildInventoryList() {
-    final items = [
-      {
-        'name': 'Organic Fertilizer',
-        'quantity': '500 kg',
-        'status': 'In Stock',
-        'icon': Icons.spa,
-      },
-      {
-        'name': 'Seeds',
-        'quantity': '100 kg',
-        'status': 'In Stock',
-        'icon': Icons.grain,
-      },
-      {
-        'name': 'Pesticides',
-        'quantity': '50 L',
-        'status': 'Low Stock',
-        'icon': Icons.eco,
-      },
-    ];
-
-    return Column(
-      children: items.map((item) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.blue[100],
-              child: Icon(
-                item['icon'] as IconData,
-                color: Colors.blue[700],
-              ),
-            ),
-            title: Text(
-              item['name'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(item['quantity'] as String),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: item['status'] == 'In Stock' ? Colors.green[100] : Colors.orange[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                item['status'] as String,
-                style: TextStyle(
-                  color: item['status'] == 'In Stock' ? Colors.green[700] : Colors.orange[700],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildLowStockList() {
-    final items = [
-      {
-        'name': 'Pesticides',
-        'quantity': '5 L',
-        'reorder': '10 L',
-        'icon': Icons.eco,
-      },
-      {
-        'name': 'Fertilizer',
-        'quantity': '50 kg',
-        'reorder': '100 kg',
-        'icon': Icons.spa,
-      },
-    ];
-
-    return Column(
-      children: items.map((item) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.red[100],
-              child: Icon(
-                item['icon'] as IconData,
-                color: Colors.red[700],
-              ),
-            ),
-            title: Text(
-              item['name'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text('Current: ${item['quantity']}'),
-            trailing: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[700],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text('Reorder ${item['reorder']}'),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildEquipmentList() {
-    final equipment = [
-      {
-        'name': 'Tractor',
-        'status': 'Operational',
-        'lastMaintenance': '2 weeks ago',
-        'icon': Icons.agriculture,
-      },
-      {
-        'name': 'Irrigation System',
-        'status': 'Maintenance Due',
-        'lastMaintenance': '1 month ago',
-        'icon': Icons.water_drop,
-      },
-      {
-        'name': 'Harvester',
-        'status': 'Operational',
-        'lastMaintenance': '3 weeks ago',
-        'icon': Icons.agriculture,
-      },
-    ];
-
-    return Column(
-      children: equipment.map((item) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.purple[100],
-              child: Icon(
-                item['icon'] as IconData,
-                color: Colors.purple[700],
-              ),
-            ),
-            title: Text(
-              item['name'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text('Last Maintenance: ${item['lastMaintenance']}'),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: item['status'] == 'Operational' ? Colors.green[100] : Colors.orange[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                item['status'] as String,
-                style: TextStyle(
-                  color: item['status'] == 'Operational' ? Colors.green[700] : Colors.orange[700],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildMaintenanceList() {
-    final maintenance = [
-      {
-        'equipment': 'Irrigation System',
-        'date': 'Tomorrow',
-        'type': 'Regular Check',
-        'icon': Icons.water_drop,
-      },
-      {
-        'equipment': 'Tractor',
-        'date': 'Next Week',
-        'type': 'Oil Change',
-        'icon': Icons.agriculture,
-      },
-    ];
-
-    return Column(
-      children: maintenance.map((item) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.blue[100],
-              child: Icon(
-                item['icon'] as IconData,
-                color: Colors.blue[700],
-              ),
-            ),
-            title: Text(
-              item['equipment'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(item['type'] as String),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                item['date'] as String,
-                style: TextStyle(
-                  color: Colors.blue[700],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildAnalyticsCards() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildAnalyticsCard(
-                'Total Area',
-                '12 acres',
-                Icons.crop_square,
-                Colors.green,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildAnalyticsCard(
-                'Yield',
-                '85%',
-                Icons.trending_up,
-                Colors.blue,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildAnalyticsCard(
-                'Revenue',
-                '\$12,500',
-                Icons.attach_money,
-                Colors.orange,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildAnalyticsCard(
-                'Efficiency',
-                '92%',
-                Icons.speed,
-                Colors.purple,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAnalyticsCard(String title, String value, IconData icon, Color color) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
-              color: color,
-              size: 32,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActivityList() {
-    final activities = [
-      {
-        'title': 'Wheat Harvested',
-        'time': '2 hours ago',
-        'icon': Icons.agriculture,
-        'color': Colors.green,
-      },
-      {
-        'title': 'New Equipment Added',
-        'time': '5 hours ago',
-        'icon': Icons.agriculture,
-        'color': Colors.blue,
-      },
-      {
-        'title': 'Inventory Updated',
-        'time': '1 day ago',
-        'icon': Icons.inventory,
-        'color': Colors.orange,
-      },
-    ];
-
-    return Column(
-      children: activities.map((activity) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: (activity['color'] as Color).withOpacity(0.1),
-              child: Icon(
-                activity['icon'] as IconData,
-                color: activity['color'] as Color,
-              ),
-            ),
-            title: Text(
-              activity['title'] as String,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Text(activity['time'] as String),
-          ),
-        );
-      }).toList(),
     );
   }
 

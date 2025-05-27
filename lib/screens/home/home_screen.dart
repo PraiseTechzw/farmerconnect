@@ -51,10 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('FarmerConnect'),
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('FarmerConnect'),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
+            child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -512,11 +512,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   IconData _getActivityIcon(int index) {
     final icons = [
