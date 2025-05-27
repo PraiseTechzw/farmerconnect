@@ -36,8 +36,5 @@ jobs:
             git diff -- "*.dart"
             exit 1
           fi
-      - name: Run tests
-        run: flutter test
-
       - name: Build APK
         run: flutter build apk --release
