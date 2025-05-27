@@ -47,7 +47,12 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
           IconButton(
             icon: const Icon(Icons.calendar_today),
             onPressed: () {
-              // Show calendar view
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CalendarScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -86,107 +91,47 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
         ..._crops.map((crop) {
           return Card(
             margin: const EdgeInsets.only(bottom: 16),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.green[100],
+                child: Icon(
+                  crop['icon'] as IconData,
+                  color: Colors.green[700],
+                ),
+              ),
+              title: Text(
+                crop['name'] as String,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.green[100],
-                        child: Icon(
-                          crop['icon'] as IconData,
-                          color: Colors.green[700],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              crop['name'] as String,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              crop['area'] as String,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green[100],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          crop['status'] as String,
-                          style: TextStyle(
-                            color: Colors.green[700],
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+                  Text('Area: ${crop['area']}'),
+                  Text('Planting: ${crop['plantingDate']}'),
+                  Text('Harvest: ${crop['harvestDate']}'),
+                ],
+              ),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    crop['status'] as String,
+                    style: TextStyle(
+                      color: Colors.green[700],
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Planting Date',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            crop['plantingDate'] as String,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Harvest Date',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            crop['harvestDate'] as String,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  LinearProgressIndicator(
-                    value: crop['progress'] as double,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green[700]!),
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    width: 100,
+                    child: LinearProgressIndicator(
+                      value: crop['progress'] as double,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green[700]!),
+                    ),
                   ),
                 ],
               ),
@@ -292,23 +237,56 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Today',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.wb_sunny),
-                        const SizedBox(width: 8),
-                        Text(
-                          '25°C',
+                        const Text(
+                          'Current',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange[700],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.wb_sunny, size: 32),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  '25°C',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  'Sunny',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Humidity: 65%',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          'Wind: 10 km/h',
+                          style: TextStyle(
+                            color: Colors.grey[600],
                           ),
                         ),
                       ],
@@ -316,14 +294,16 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                const Divider(),
+                const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildWeatherDay('Mon', Icons.wb_sunny, '26°C'),
-                    _buildWeatherDay('Tue', Icons.cloud, '24°C'),
-                    _buildWeatherDay('Wed', Icons.grain, '23°C'),
-                    _buildWeatherDay('Thu', Icons.wb_sunny, '25°C'),
-                    _buildWeatherDay('Fri', Icons.water_drop, '22°C'),
+                    _buildForecastDay('Mon', Icons.wb_sunny, '28°C'),
+                    _buildForecastDay('Tue', Icons.cloud, '25°C'),
+                    _buildForecastDay('Wed', Icons.water_drop, '22°C'),
+                    _buildForecastDay('Thu', Icons.wb_sunny, '26°C'),
+                    _buildForecastDay('Fri', Icons.cloud, '24°C'),
                   ],
                 ),
               ],
@@ -334,7 +314,7 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
     );
   }
 
-  Widget _buildWeatherDay(String day, IconData icon, String temp) {
+  Widget _buildForecastDay(String day, IconData icon, String temp) {
     return Column(
       children: [
         Text(
@@ -346,18 +326,15 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
         const SizedBox(height: 8),
         Icon(icon),
         const SizedBox(height: 8),
-        Text(
-          temp,
-          style: TextStyle(
-            color: Colors.orange[700],
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        Text(temp),
       ],
     );
   }
 
   void _showAddCropDialog() {
+    DateTime? selectedPlantingDate;
+    DateTime? selectedHarvestDate;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -386,8 +363,35 @@ class _CropPlanningScreenState extends State<CropPlanningScreen> {
                 border: OutlineInputBorder(),
               ),
               readOnly: true,
-              onTap: () {
-                // Show date picker
+              onTap: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                );
+                if (date != null) {
+                  selectedPlantingDate = date;
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'Expected Harvest Date',
+                border: OutlineInputBorder(),
+              ),
+              readOnly: true,
+              onTap: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now().add(const Duration(days: 120)),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                );
+                if (date != null) {
+                  selectedHarvestDate = date;
+                }
               },
             ),
           ],
