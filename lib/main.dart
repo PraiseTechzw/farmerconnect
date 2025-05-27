@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'constants/theme/themes_notifier.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/marketplace/marketplace_screen.dart';
-import 'screens/farm_management/farm_management_screen.dart';
+import 'screens/farm/farm_management_screen.dart';
 import 'screens/community/community_screen.dart';
 import 'screens/financial/financial_screen.dart';
 import 'providers/crop_provider.dart';
