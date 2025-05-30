@@ -76,4 +76,13 @@ class FirebaseService {
       rethrow;
     }
   }
+
+  // Add data to a collection with specific document ID
+  Future<void> addDataWithId(String collection, String documentId, Map<String, dynamic> data) async {
+    try {
+      await _firestore.collection(collection).doc(documentId).set(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
 } 

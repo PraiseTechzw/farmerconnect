@@ -44,7 +44,8 @@ class AuthService {
           'is_phone_verified': false,
           'created_at': DateTime.now().toIso8601String(),
         };
-        await _firebase.updateData('users', response.user!.id, data);
+        // Create the document with user ID
+        await _firebase.addDataWithId('users', response.user!.id, data);
       }
 
       return response;

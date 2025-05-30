@@ -3,6 +3,7 @@ import 'package:farmer_connect/service/auth_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:farmer_connect/screens/auth/phone_verification_screen.dart';
+import 'package:farmer_connect/screens/auth/verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -58,36 +59,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Sign up the user
-      final response = await _authService.signUp(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        fullName: _fullNameController.text.trim(),
-        phoneNumber: '+${_selectedCountry?.phoneCode}${_phoneController.text.trim()}',
-      );
-
-      if (!mounted) return;
+      // Format phone number with country code
+      final formattedPhone = '+${_selectedCountry!.phoneCode}${_phoneController.text}';
 
       // Send verification code
-      final verificationId = await _authService.sendPhoneVerificationCode(
-        '+${_selectedCountry?.phoneCode}${_phoneController.text.trim()}',
-      );
+      final verificationId = await _authService.sendPhoneVerificationCode(formattedPhone);
 
-      // Navigate to verification screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PhoneVerificationScreen(
-            phoneNumber: '+${_selectedCountry?.phoneCode}${_phoneController.text.trim()}',
-            verificationId: verificationId,
+      if (mounted) {
+        // Navigate to verification screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VerificationScreen(
+              phoneNumber: formattedPhone,
+              verificationId: verificationId,
+            ),
           ),
-        ),
-      );
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(e.toString()),
             backgroundColor: Colors.red,
           ),
         );
@@ -138,15 +132,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                     // Logo and Title
                     Icon(
                       Icons.person_add,
@@ -190,10 +184,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     .slideY(begin: 0.3, end: 0),
                     const SizedBox(height: 32),
                     // Full Name Field
-                    TextFormField(
-                      controller: _fullNameController,
+                  TextFormField(
+                    controller: _fullNameController,
                       decoration: InputDecoration(
-                        labelText: 'Full Name',
+                      labelText: 'Full Name',
                         hintText: 'Enter your full name',
                         prefixIcon: Icon(
                           Icons.person_outline,
@@ -233,23 +227,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           horizontal: 16,
                           vertical: 16,
                         ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your full name';
-                        }
-                        return null;
-                      },
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your full name';
+                      }
+                      return null;
+                    },
                     )
                     .animate()
                     .fadeIn(delay: const Duration(milliseconds: 400))
                     .slideX(begin: 0.2, end: 0),
-                    const SizedBox(height: 16),
+                  const SizedBox(height: 16),
                     // Email Field
-                    TextFormField(
-                      controller: _emailController,
+                  TextFormField(
+                    controller: _emailController,
                       decoration: InputDecoration(
-                        labelText: 'Email',
+                      labelText: 'Email',
                         hintText: 'Enter your email',
                         prefixIcon: Icon(
                           Icons.email_outlined,
@@ -289,14 +283,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           horizontal: 16,
                           vertical: 16,
                         ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        return null;
-                      },
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      return null;
+                    },
                     )
                     .animate()
                     .fadeIn(delay: const Duration(milliseconds: 500))
@@ -348,9 +342,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Phone Number Field
                         Expanded(
                           child: TextFormField(
-                            controller: _phoneController,
+                    controller: _phoneController,
                             decoration: InputDecoration(
-                              labelText: 'Phone Number',
+                      labelText: 'Phone Number',
                               hintText: 'Enter your phone number',
                               prefixIcon: Icon(
                                 Icons.phone_outlined,
@@ -390,27 +384,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 horizontal: 16,
                                 vertical: 16,
                               ),
-                            ),
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your phone number';
-                              }
+                    ),
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your phone number';
+                      }
                               // Add phone number validation if needed
-                              return null;
-                            },
+                      return null;
+                    },
                           ),
                         ).animate()
                         .fadeIn(delay: const Duration(milliseconds: 600))
                         .slideX(begin: 0.2, end: 0),
                       ],
-                    ),
-                    const SizedBox(height: 16),
+                  ),
+                  const SizedBox(height: 16),
                     // Password Field
-                    TextFormField(
-                      controller: _passwordController,
+                  TextFormField(
+                    controller: _passwordController,
                       decoration: InputDecoration(
-                        labelText: 'Password',
+                      labelText: 'Password',
                         hintText: 'Enter your password',
                         prefixIcon: Icon(
                           Icons.lock_outline,
@@ -465,25 +459,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       obscureText: _obscurePassword,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
+                      }
+                      return null;
+                    },
                     )
                     .animate()
                     .fadeIn(delay: const Duration(milliseconds: 700))
                     .slideX(begin: 0.2, end: 0),
-                    const SizedBox(height: 16),
+                  const SizedBox(height: 16),
                     // Confirm Password Field
-                    TextFormField(
-                      controller: _confirmPasswordController,
+                  TextFormField(
+                    controller: _confirmPasswordController,
                       decoration: InputDecoration(
-                        labelText: 'Confirm Password',
+                      labelText: 'Confirm Password',
                         hintText: 'Confirm your password',
                         prefixIcon: Icon(
                           Icons.lock_outline,
@@ -538,38 +532,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       obscureText: _obscureConfirmPassword,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please confirm your password';
-                        }
-                        if (value != _passwordController.text) {
-                          return 'Passwords do not match';
-                        }
-                        return null;
-                      },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please confirm your password';
+                      }
+                      if (value != _passwordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
                     )
                     .animate()
                     .fadeIn(delay: const Duration(milliseconds: 800))
                     .slideX(begin: 0.2, end: 0),
                     const SizedBox(height: 32),
                     // Register Button
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _register,
-                      style: ElevatedButton.styleFrom(
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _register,
+                    style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade700,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 0,
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
                                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )

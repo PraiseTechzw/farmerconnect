@@ -1,9 +1,6 @@
 import 'package:farmer_connect/constants/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'constants/theme/themes_notifier.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/marketplace/marketplace_screen.dart';
@@ -16,7 +13,6 @@ import 'providers/ai_provider.dart';
 import 'package:farmer_connect/service/firebase_service.dart';
 import 'package:farmer_connect/service/supabase_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:farmer_connect/service/auth_service.dart';
 import 'package:farmer_connect/screens/auth/login_screen.dart';
 import 'package:farmer_connect/screens/onboarding/onboarding_screen.dart';
 import 'package:farmer_connect/screens/splash_screen.dart';
