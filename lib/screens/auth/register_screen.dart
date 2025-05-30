@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:farmer_connect/service/auth_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:country_picker/country_picker.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -20,6 +21,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  Country? _selectedCountry;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default country (e.g., Nigeria)
+    _selectedCountry = Country(
+      phoneCode: '234',
+      countryCode: 'NG',
+      e164Sc: 0,
+      geographic: true,
+      level: 1,
+      name: 'Nigeria',
+      example: '7012345678',
+      displayName: 'Nigeria (NG) [+234]',
+      displayNameNoCountryCode: 'Nigeria (NG)',
+      e164Key: '234-NG-0',
+    );
+  }
 
   @override
   void dispose() {
@@ -41,7 +61,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
         fullName: _fullNameController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
+        phoneNumber: '+${_selectedCountry?.phoneCode}${_phoneController.text.trim()}',
       );
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/home');
@@ -49,7 +69,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -57,6 +80,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showCountryPicker() {
+    showCountryPicker(
+      context: context,
+      showPhoneCode: true,
+      countryListTheme: CountryListThemeData(
+        borderRadius: BorderRadius.circular(12),
+        inputDecoration: InputDecoration(
+          labelText: 'Search',
+          hintText: 'Start typing to search',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      onSelect: (Country country) {
+        setState(() {
+          _selectedCountry = country;
+        });
+      },
+    );
   }
 
   @override
@@ -240,61 +286,108 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     .slideX(begin: 0.2, end: 0),
                     const SizedBox(height: 16),
                     // Phone Field
-                    TextFormField(
-                      controller: _phoneController,
-                      decoration: InputDecoration(
-                        labelText: 'Phone Number',
-                        hintText: 'Enter your phone number',
-                        prefixIcon: Icon(
-                          Icons.phone_outlined,
-                          color: Colors.green.shade700,
-                        ),
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        labelStyle: TextStyle(
-                          color: Colors.green.shade700,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        hintStyle: TextStyle(
-                          color: Colors.grey.shade400,
-                          fontSize: 14,
-                        ),
-                        border: OutlineInputBorder(
+                    Row(
+                      children: [
+                        // Country Code Button
+                        InkWell(
+                          onTap: _showCountryPicker,
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade200,
-                            width: 1,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.grey.shade200,
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '+${_selectedCountry?.phoneCode}',
+                                  style: TextStyle(
+                                    color: Colors.green.shade700,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.green.shade700,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.green.shade700,
-                            width: 2,
+                        ).animate()
+                        .fadeIn(delay: const Duration(milliseconds: 600))
+                        .slideX(begin: 0.2, end: 0),
+                        const SizedBox(width: 12),
+                        // Phone Number Field
+                        Expanded(
+                          child: TextFormField(
+                            controller: _phoneController,
+                            decoration: InputDecoration(
+                              labelText: 'Phone Number',
+                              hintText: 'Enter your phone number',
+                              prefixIcon: Icon(
+                                Icons.phone_outlined,
+                                color: Colors.green.shade700,
+                              ),
+                              floatingLabelBehavior: FloatingLabelBehavior.always,
+                              labelStyle: TextStyle(
+                                color: Colors.green.shade700,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontSize: 14,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade200,
+                                  width: 1,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.green.shade700,
+                                  width: 2,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
+                            ),
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your phone number';
+                              }
+                              // Add phone number validation if needed
+                              return null;
+                            },
                           ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                      ),
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your phone number';
-                        }
-                        return null;
-                      },
-                    )
-                    .animate()
-                    .fadeIn(delay: const Duration(milliseconds: 600))
-                    .slideX(begin: 0.2, end: 0),
+                        ).animate()
+                        .fadeIn(delay: const Duration(milliseconds: 600))
+                        .slideX(begin: 0.2, end: 0),
+                      ],
+                    ),
                     const SizedBox(height: 16),
                     // Password Field
                     TextFormField(
