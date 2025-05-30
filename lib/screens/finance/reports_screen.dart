@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:farmer_connect/providers/finance_provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 
 class ReportsScreen extends StatefulWidget {
@@ -8,674 +11,707 @@ class ReportsScreen extends StatefulWidget {
   State<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  final currencyFormat = NumberFormat.currency(symbol: '\$');
-
-  final List<Map<String, dynamic>> _monthlyData = [
-    {
-      'month': 'Jan',
-      'income': 8500.00,
-      'expenses': 3200.00,
-    },
-    {
-      'month': 'Feb',
-      'income': 9200.00,
-      'expenses': 3800.00,
-    },
-    {
-      'month': 'Mar',
-      'income': 12500.00,
-      'expenses': 4200.00,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _cropPerformance = [
-    {
-      'crop': 'Tomatoes',
-      'revenue': 8500.00,
-      'cost': 3200.00,
-      'profit': 5300.00,
-      'yield': '2.5 tons',
-    },
-    {
-      'crop': 'Lettuce',
-      'revenue': 6200.00,
-      'cost': 2800.00,
-      'profit': 3400.00,
-      'yield': '1.8 tons',
-    },
-    {
-      'crop': 'Cucumbers',
-      'revenue': 4800.00,
-      'cost': 2100.00,
-      'profit': 2700.00,
-      'yield': '1.2 tons',
-    },
-  ];
+class _ReportsScreenState extends State<ReportsScreen> {
+  String _selectedPeriod = 'This Month';
+  String _selectedReport = 'Income vs Expenses';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    // Initialize data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FinanceProvider>().initializeData();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              expandedHeight: 200,
-              pinned: true,
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.green[700]!,
-                        Colors.green[600]!,
-                      ],
-                    ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            expandedHeight: 200,
+            backgroundColor: Colors.green,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.green.shade700,
+                      Colors.green.shade500,
+                    ],
                   ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 40),
                       const Text(
                         'Financial Reports',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _buildReportFilters(),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
-              ),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(48),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, -5),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: _selectedPeriod,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white.withOpacity(0.2),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                              ),
+                              dropdownColor: Colors.green.shade700,
+                              style: const TextStyle(color: Colors.white),
+                              items: [
+                                'This Month',
+                                'Last Month',
+                                'This Year',
+                                'Last Year',
+                                'Custom',
+                              ].map((period) {
+                                return DropdownMenuItem(
+                                  value: period,
+                                  child: Text(period),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedPeriod = value;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: _selectedReport,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white.withOpacity(0.2),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                              ),
+                              dropdownColor: Colors.green.shade700,
+                              style: const TextStyle(color: Colors.white),
+                              items: [
+                                'Income vs Expenses',
+                                'Category Analysis',
+                                'Monthly Trends',
+                                'Budget Performance',
+                              ].map((report) {
+                                return DropdownMenuItem(
+                                  value: report,
+                                  child: Text(report),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedReport = value;
+                                  });
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: TabBar(
-                    controller: _tabController,
-                    indicatorColor: Colors.green[700],
-                    indicatorWeight: 3,
-                    labelColor: Colors.green[700],
-                    unselectedLabelColor: Colors.grey[600],
-                    labelStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.5,
-                    ),
-                    tabs: const [
-                      Tab(text: 'Overview'),
-                      Tab(text: 'Crop Analysis'),
-                      Tab(text: 'Trends'),
                     ],
                   ),
                 ),
               ),
             ),
-          ];
-        },
-        body: TabBarView(
-          controller: _tabController,
+          ),
+          Consumer<FinanceProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading) {
+                return const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+
+              if (provider.error != null) {
+                return SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      'Error: ${provider.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                );
+              }
+
+              return SliverList(
+                delegate: SliverChildListDelegate([
+                  _buildReportContent(provider),
+                ]),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReportContent(FinanceProvider provider) {
+    switch (_selectedReport) {
+      case 'Income vs Expenses':
+        return _buildIncomeVsExpensesReport(provider);
+      case 'Category Analysis':
+        return _buildCategoryAnalysisReport(provider);
+      case 'Monthly Trends':
+        return _buildMonthlyTrendsReport(provider);
+      case 'Budget Performance':
+        return _buildBudgetPerformanceReport(provider);
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Widget _buildIncomeVsExpensesReport(FinanceProvider provider) {
+    final summary = provider.financialSummary;
+    final totalIncome = summary['totalIncome'] ?? 0;
+    final totalExpenses = summary['totalExpenses'] ?? 0;
+    final netProfit = summary['netProfit'] ?? 0;
+
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildOverviewTab(),
-            _buildCropAnalysisTab(),
-            _buildTrendsTab(),
+            const Text(
+              'Income vs Expenses',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildSummaryCard(
+                    'Total Income',
+                    totalIncome,
+                    Colors.green,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildSummaryCard(
+                    'Total Expenses',
+                    totalExpenses,
+                    Colors.red,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildSummaryCard(
+              'Net Profit',
+              netProfit,
+              netProfit >= 0 ? Colors.blue : Colors.red,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: totalIncome > totalExpenses ? totalIncome : totalExpenses,
+                  barTouchData: BarTouchData(enabled: false),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          switch (value.toInt()) {
+                            case 0:
+                              return const Text('Income');
+                            case 1:
+                              return const Text('Expenses');
+                            default:
+                              return const Text('');
+                          }
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  gridData: FlGridData(show: false),
+                  barGroups: [
+                    BarChartGroupData(
+                      x: 0,
+                      barRods: [
+                        BarChartRodData(
+                          toY: totalIncome,
+                          color: Colors.green,
+                          width: 20,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(6),
+                          ),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 1,
+                      barRods: [
+                        BarChartRodData(
+                          toY: totalExpenses,
+                          color: Colors.red,
+                          width: 20,
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildReportFilters() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          _buildFilterChip('This Month', true),
-          const SizedBox(width: 8),
-          _buildFilterChip('Last 3 Months', false),
-          const SizedBox(width: 8),
-          _buildFilterChip('This Year', false),
-        ],
-      ),
-    );
-  }
+  Widget _buildCategoryAnalysisReport(FinanceProvider provider) {
+    final expenses = provider.categoryExpenses;
+    if (expenses.isEmpty) return const SizedBox.shrink();
 
-  Widget _buildFilterChip(String label, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: isSelected ? [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ] : null,
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? Colors.green[700] : Colors.white,
-          fontSize: 14,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+    final total = expenses.values.fold<double>(0, (sum, amount) => sum + amount);
+    final sections = expenses.entries.map((entry) {
+      return PieChartSectionData(
+        value: entry.value,
+        title: '${((entry.value / total) * 100).toStringAsFixed(1)}%',
+        color: _getCategoryColor(entry.key),
+        radius: 100,
+        titleStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }).toList();
+
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Category Analysis',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: PieChart(
+                PieChartData(
+                  sections: sections,
+                  centerSpaceRadius: 40,
+                  sectionsSpace: 2,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 16,
+              runSpacing: 8,
+              children: expenses.entries.map((entry) {
+                return _buildLegendItem(
+                  entry.key,
+                  _getCategoryColor(entry.key),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Category Breakdown',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: expenses.length,
+              itemBuilder: (context, index) {
+                final entry = expenses.entries.elementAt(index);
+                final percentage = (entry.value / total) * 100;
+
+                return ListTile(
+                  leading: Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: _getCategoryColor(entry.key),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  title: Text(entry.key),
+                  trailing: Text(
+                    '${percentage.toStringAsFixed(1)}%',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildOverviewTab() {
-    return SingleChildScrollView(
+  Widget _buildMonthlyTrendsReport(FinanceProvider provider) {
+    final trends = provider.monthlyTrends;
+    if (trends.isEmpty) return const SizedBox.shrink();
+
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Monthly Trends',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  gridData: FlGridData(show: false),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          if (value.toInt() >= trends.length) return const Text('');
+                          return Text(
+                            'M${value.toInt() + 1}',
+                            style: const TextStyle(fontSize: 12),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: trends.asMap().entries.map((entry) {
+                        return FlSpot(
+                          entry.key.toDouble(),
+                          entry.value['income'] ?? 0,
+                        );
+                      }).toList(),
+                      isCurved: true,
+                      color: Colors.green,
+                      barWidth: 3,
+                      dotData: FlDotData(show: false),
+                    ),
+                    LineChartBarData(
+                      spots: trends.asMap().entries.map((entry) {
+                        return FlSpot(
+                          entry.key.toDouble(),
+                          entry.value['expenses'] ?? 0,
+                        );
+                      }).toList(),
+                      isCurved: true,
+                      color: Colors.red,
+                      barWidth: 3,
+                      dotData: FlDotData(show: false),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildLegendItem('Income', Colors.green),
+                const SizedBox(width: 16),
+                _buildLegendItem('Expenses', Colors.red),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Monthly Breakdown',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: trends.length,
+              itemBuilder: (context, index) {
+                final month = trends[index];
+                final income = month['income'] ?? 0;
+                final expenses = month['expenses'] ?? 0;
+                final profit = month['profit'] ?? 0;
+
+                return ListTile(
+                  title: Text('Month ${index + 1}'),
+                  subtitle: Text(
+                    'Profit: \$${profit.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: profit >= 0 ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  trailing: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Income: \$${income.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        'Expenses: \$${expenses.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBudgetPerformanceReport(FinanceProvider provider) {
+    final budgets = provider.budgets;
+    if (budgets.isEmpty) return const SizedBox.shrink();
+
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Budget Performance',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: budgets.length,
+              itemBuilder: (context, index) {
+                final budget = budgets[index];
+                final progress = budget.progress;
+                final color = progress > 100 ? Colors.red : Colors.green;
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              budget.category,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${progress.toStringAsFixed(1)}%',
+                              style: TextStyle(
+                                color: color,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: progress / 100,
+                            backgroundColor: Colors.grey[200],
+                            valueColor: AlwaysStoppedAnimation<Color>(color),
+                            minHeight: 8,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Spent: \$${budget.spent.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              'Budget: \$${budget.amount.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard(String title, double amount, Color color) {
+    return Container(
       padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSummaryCards(),
-          const SizedBox(height: 24),
-          _buildMonthlyComparison(),
-          const SizedBox(height: 24),
-          _buildTopExpenses(),
+          Text(
+            title,
+            style: TextStyle(
+              color: color,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '\$${amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryCards() {
+  Widget _buildLegendItem(String label, Color color) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(
-          child: _buildSummaryCard(
-            'Total Revenue',
-            '\$30,200',
-            Icons.arrow_upward,
-            Colors.green[300]!,
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildSummaryCard(
-            'Total Expenses',
-            '\$11,200',
-            Icons.arrow_downward,
-            Colors.red[300]!,
-          ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12),
         ),
       ],
     );
   }
 
-  Widget _buildSummaryCard(
-      String title, String amount, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            amount,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMonthlyComparison() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Monthly Comparison',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _monthlyData.length,
-            itemBuilder: (context, index) {
-              final data = _monthlyData[index];
-              return _buildMonthlyComparisonRow(data);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMonthlyComparisonRow(Map<String, dynamic> data) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              data['month'],
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Income: ${currencyFormat.format(data['income'])}',
-                  style: TextStyle(
-                    color: Colors.green[700],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Expenses: ${currencyFormat.format(data['expenses'])}',
-                  style: TextStyle(
-                    color: Colors.red[700],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              currencyFormat.format(data['income'] - data['expenses']),
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.end,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTopExpenses() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Top Expenses',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildExpenseRow('Equipment', 4200.00, 0.4),
-          _buildExpenseRow('Supplies', 3200.00, 0.3),
-          _buildExpenseRow('Labor', 2800.00, 0.2),
-          _buildExpenseRow('Other', 1000.00, 0.1),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExpenseRow(String category, double amount, double percentage) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(category),
-              Text(
-                currencyFormat.format(amount),
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: percentage,
-            backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.green[700]!),
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCropAnalysisTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildCropPerformanceTable(),
-          const SizedBox(height: 24),
-          _buildCropProfitability(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCropPerformanceTable() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Crop Performance',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              columns: const [
-                DataColumn(label: Text('Crop')),
-                DataColumn(label: Text('Revenue')),
-                DataColumn(label: Text('Cost')),
-                DataColumn(label: Text('Profit')),
-                DataColumn(label: Text('Yield')),
-              ],
-              rows: _cropPerformance.map((crop) {
-                return DataRow(
-                  cells: [
-                    DataCell(Text(crop['crop'])),
-                    DataCell(Text(currencyFormat.format(crop['revenue']))),
-                    DataCell(Text(currencyFormat.format(crop['cost']))),
-                    DataCell(Text(currencyFormat.format(crop['profit']))),
-                    DataCell(Text(crop['yield'])),
-                  ],
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCropProfitability() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Crop Profitability',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _cropPerformance.length,
-            itemBuilder: (context, index) {
-              final crop = _cropPerformance[index];
-              return _buildCropProfitabilityRow(crop);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCropProfitabilityRow(Map<String, dynamic> crop) {
-    final profitMargin = crop['profit'] / crop['revenue'];
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                crop['crop'],
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '${(profitMargin * 100).toStringAsFixed(1)}%',
-                style: TextStyle(
-                  color: profitMargin > 0.5
-                      ? Colors.green[700]
-                      : Colors.orange[700],
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: profitMargin,
-            backgroundColor: Colors.grey[200],
-            valueColor: AlwaysStoppedAnimation<Color>(
-              profitMargin > 0.5 ? Colors.green[700]! : Colors.orange[700]!,
-            ),
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrendsTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTrendCard(
-            'Revenue Growth',
-            '15% increase from last month',
-            Icons.trending_up,
-            Colors.green[700]!,
-          ),
-          const SizedBox(height: 16),
-          _buildTrendCard(
-            'Expense Reduction',
-            '8% decrease in operational costs',
-            Icons.trending_down,
-            Colors.red[700]!,
-          ),
-          const SizedBox(height: 16),
-          _buildTrendCard(
-            'Profit Margin',
-            '22% improvement in overall profitability',
-            Icons.show_chart,
-            Colors.blue[700]!,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTrendCard(
-      String title, String description, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: color.withOpacity(0.1),
-            child: Icon(icon, color: color),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  description,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+  Color _getCategoryColor(String category) {
+    final colors = {
+      'Food': Colors.orange,
+      'Transport': Colors.blue,
+      'Utilities': Colors.purple,
+      'Entertainment': Colors.pink,
+      'Other': Colors.grey,
+    };
+    return colors[category] ?? Colors.grey;
   }
 }
+
