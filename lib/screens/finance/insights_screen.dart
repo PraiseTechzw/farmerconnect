@@ -11,74 +11,78 @@ class InsightsScreen extends StatefulWidget {
 class _InsightsScreenState extends State<InsightsScreen> {
   final currencyFormat = NumberFormat.currency(symbol: '\$');
 
-  final List<Map<String, dynamic>> _insights = [
+  final List<Map<String, dynamic>> _monthlyTrends = [
     {
-      'title': 'Cost Optimization',
-      'description':
-          'Your equipment maintenance costs are 15% higher than similar farms. Consider preventive maintenance to reduce long-term costs.',
-      'type': 'cost',
-      'icon': Icons.trending_down,
-      'color': Colors.red,
+      'month': 'Jan',
+      'income': 8500.00,
+      'expenses': 3200.00,
+      'profit': 5300.00,
     },
     {
-      'title': 'Revenue Opportunity',
-      'description':
-          'Market prices for tomatoes are expected to rise by 20% in the next quarter. Consider increasing production.',
-      'type': 'revenue',
-      'icon': Icons.trending_up,
-      'color': Colors.green,
+      'month': 'Feb',
+      'income': 9200.00,
+      'expenses': 3800.00,
+      'profit': 5400.00,
     },
     {
-      'title': 'Efficiency Improvement',
-      'description':
-          'Your water usage efficiency is below average. Implementing drip irrigation could save up to 30% on water costs.',
-      'type': 'efficiency',
-      'icon': Icons.water_drop,
-      'color': Colors.blue,
+      'month': 'Mar',
+      'income': 12500.00,
+      'expenses': 4200.00,
+      'profit': 8300.00,
     },
   ];
 
-  final List<Map<String, dynamic>> _marketTrends = [
+  final List<Map<String, dynamic>> _expenseCategories = [
     {
-      'crop': 'Tomatoes',
-      'currentPrice': 2.50,
-      'trend': 'up',
-      'change': 0.30,
-      'forecast': 'Expected to remain high for next 2 months',
+      'category': 'Equipment',
+      'amount': 4200.00,
+      'percentage': 0.35,
+      'icon': Icons.build,
+      'color': Colors.blue,
     },
     {
-      'crop': 'Lettuce',
-      'currentPrice': 1.80,
-      'trend': 'down',
-      'change': 0.20,
-      'forecast': 'Prices may stabilize in coming weeks',
+      'category': 'Supplies',
+      'amount': 3200.00,
+      'percentage': 0.25,
+      'icon': Icons.inventory,
+      'color': Colors.orange,
     },
     {
-      'crop': 'Cucumbers',
-      'currentPrice': 1.50,
-      'trend': 'stable',
-      'change': 0.00,
-      'forecast': 'Stable market conditions expected',
+      'category': 'Labor',
+      'amount': 2800.00,
+      'percentage': 0.20,
+      'icon': Icons.people,
+      'color': Colors.purple,
+    },
+    {
+      'category': 'Utilities',
+      'amount': 2000.00,
+      'percentage': 0.15,
+      'icon': Icons.power,
+      'color': Colors.red,
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                     colors: [
                       Colors.green[700]!,
-                      Colors.green[500]!,
+                      Colors.green[600]!,
                     ],
                   ),
                 ),
@@ -92,29 +96,29 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         color: Colors.white,
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildInsightStats(),
+                    _buildInsightFilters(),
                     const SizedBox(height: 16),
                   ],
                 ),
               ),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildInsightsSection(),
-                  const SizedBox(height: 24),
-                  _buildMarketTrendsSection(),
-                  const SizedBox(height: 24),
-                  _buildRecommendationsSection(),
-                ],
-              ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _buildKeyMetrics(),
+                const SizedBox(height: 24),
+                _buildExpenseBreakdown(),
+                const SizedBox(height: 24),
+                _buildMonthlyTrends(),
+                const SizedBox(height: 24),
+                _buildRecommendations(),
+              ]),
             ),
           ),
         ],
@@ -122,57 +126,242 @@ class _InsightsScreenState extends State<InsightsScreen> {
     );
   }
 
-  Widget _buildInsightStats() {
-    return Padding(
+  Widget _buildInsightFilters() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          Expanded(
-            child: _buildStatCard(
-              'Cost Savings',
-              '15%',
-              Icons.savings,
-              Colors.white,
+          _buildFilterChip('This Month', true),
+          const SizedBox(width: 8),
+          _buildFilterChip('Last 3 Months', false),
+          const SizedBox(width: 8),
+          _buildFilterChip('This Year', false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, bool isSelected) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: isSelected ? [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ] : null,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? Colors.green[700] : Colors.white,
+          fontSize: 14,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildKeyMetrics() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Key Metrics',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: _buildStatCard(
-              'Revenue Growth',
-              '20%',
-              Icons.trending_up,
-              Colors.white,
-            ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: _buildMetricCard(
+                  'Total Revenue',
+                  '\$30,200',
+                  Icons.arrow_upward,
+                  Colors.green[300]!,
+                  '+15% from last month',
+                ),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: _buildMetricCard(
+                  'Total Expenses',
+                  '\$11,200',
+                  Icons.arrow_downward,
+                  Colors.red[300]!,
+                  '-8% from last month',
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(
-      String title, String value, IconData icon, Color color) {
+  Widget _buildMetricCard(
+      String title, String amount, IconData icon, Color color, String trend) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 24),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 18),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  trend,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
           Text(
-            value,
+            amount,
             style: const TextStyle(
-              color: Colors.white,
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 4),
           Text(
             title,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.grey[600],
+              fontSize: 13,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpenseBreakdown() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Expense Breakdown',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _expenseCategories.length,
+            itemBuilder: (context, index) {
+              final category = _expenseCategories[index];
+              return _buildExpenseCategoryRow(category);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpenseCategoryRow(Map<String, dynamic> category) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: (category['color'] as Color).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              category['icon'],
+              color: category['color'],
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  category['category'],
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: category['percentage'],
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(category['color']),
+                    minHeight: 6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            currencyFormat.format(category['amount']),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
           ),
@@ -181,303 +370,190 @@ class _InsightsScreenState extends State<InsightsScreen> {
     );
   }
 
-  Widget _buildInsightsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Key Insights',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+  Widget _buildMonthlyTrends() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const SizedBox(height: 16),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _insights.length,
-          itemBuilder: (context, index) {
-            final insight = _insights[index];
-            return _buildInsightCard(insight);
-          },
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Monthly Trends',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _monthlyTrends.length,
+            itemBuilder: (context, index) {
+              final trend = _monthlyTrends[index];
+              return _buildMonthlyTrendRow(trend);
+            },
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildInsightCard(Map<String, dynamic> insight) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: (insight['color'] as Color).withOpacity(0.1),
-                  child: Icon(
-                    insight['icon'] as IconData,
-                    color: insight['color'] as Color,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    insight['title'],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: (insight['color'] as Color).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    insight['type'].toString().toUpperCase(),
-                    style: TextStyle(
-                      color: insight['color'] as Color,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              insight['description'],
-              style: TextStyle(
-                color: Colors.grey[600],
+  Widget _buildMonthlyTrendRow(Map<String, dynamic> trend) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 40,
+            child: Text(
+              trend['month'],
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMarketTrendsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Market Trends',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
           ),
-        ),
-        const SizedBox(height: 16),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _marketTrends.length,
-          itemBuilder: (context, index) {
-            final trend = _marketTrends[index];
-            return _buildMarketTrendCard(trend);
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMarketTrendCard(Map<String, dynamic> trend) {
-    final isUp = trend['trend'] == 'up';
-    final isDown = trend['trend'] == 'down';
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  trend['crop'],
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: isUp
-                        ? Colors.green[100]
-                        : isDown
-                            ? Colors.red[100]
-                            : Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        isUp
-                            ? Icons.arrow_upward
-                            : isDown
-                                ? Icons.arrow_downward
-                                : Icons.remove,
-                        size: 16,
-                        color: isUp
-                            ? Colors.green[700]
-                            : isDown
-                                ? Colors.red[700]
-                                : Colors.grey[700],
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '\$${trend['change'].toStringAsFixed(2)}',
-                        style: TextStyle(
-                          color: isUp
-                              ? Colors.green[700]
-                              : isDown
-                                  ? Colors.red[700]
-                                  : Colors.grey[700],
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Current Price',
+                  'Income: ${currencyFormat.format(trend['income'])}',
                   style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
+                    color: Colors.green[700],
+                    fontSize: 13,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  '\$${trend['currentPrice'].toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                  'Expenses: ${currencyFormat.format(trend['expenses'])}',
+                  style: TextStyle(
+                    color: Colors.red[700],
+                    fontSize: 13,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              trend['forecast'],
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-              ),
+          ),
+          Text(
+            currencyFormat.format(trend['profit']),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildRecommendationsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Recommendations',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+  Widget _buildRecommendations() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const SizedBox(height: 16),
-        _buildRecommendationCard(
-          'Optimize Water Usage',
-          'Implement drip irrigation system to reduce water costs by 30%',
-          Icons.water_drop,
-          Colors.blue,
-        ),
-        _buildRecommendationCard(
-          'Equipment Maintenance',
-          'Schedule preventive maintenance to reduce repair costs',
-          Icons.build,
-          Colors.orange,
-        ),
-        _buildRecommendationCard(
-          'Crop Diversification',
-          'Consider adding high-value crops to increase revenue',
-          Icons.agriculture,
-          Colors.green,
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Recommendations',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildRecommendationCard(
+            'Optimize Equipment Costs',
+            'Consider leasing instead of buying to reduce upfront costs',
+            Icons.build,
+            Colors.blue,
+          ),
+          const SizedBox(height: 12),
+          _buildRecommendationCard(
+            'Energy Efficiency',
+            'Switch to solar power to reduce utility expenses',
+            Icons.solar_power,
+            Colors.orange,
+          ),
+          const SizedBox(height: 12),
+          _buildRecommendationCard(
+            'Labor Management',
+            'Implement seasonal hiring to optimize labor costs',
+            Icons.people,
+            Colors.purple,
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildRecommendationCard(
-    String title,
-    String description,
-    IconData icon,
-    Color color,
-  ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
+      String title, String description, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: color.withOpacity(0.1),
-              child: Icon(icon, color: color),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
                   ),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
                   ),
-                ],
-              ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.arrow_forward),
-              onPressed: () {
-                // Implementation for viewing recommendation details
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

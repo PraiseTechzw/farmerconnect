@@ -16,6 +16,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:farmer_connect/screens/auth/login_screen.dart';
 import 'package:farmer_connect/screens/onboarding/onboarding_screen.dart';
 import 'package:farmer_connect/screens/splash_screen.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:farmer_connect/providers/finance_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +27,7 @@ void main() async {
   await dotenv.load();
   
   // Initialize Firebase
-  await FirebaseService.initialize();
+  await Firebase.initializeApp();
   
   // Initialize Supabase
   await SupabaseService.initialize(
@@ -45,6 +48,7 @@ class FarmerConnectApp extends StatelessWidget {
         ChangeNotifierProvider<CropProvider>(create: (_) => CropProvider()),
         ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier()),
         ChangeNotifierProvider<AIProvider>(create: (_) => AIProvider()),
+        ChangeNotifierProvider(create: (_) => FinanceProvider()),
       ],
       child: Consumer<ThemeNotifier>(
         builder: (context, themeNotifier, child) {
@@ -54,7 +58,7 @@ class FarmerConnectApp extends StatelessWidget {
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            home: const SplashScreen(),
+            home: MainScreen(),
             routes: {
               '/splash': (context) => const SplashScreen(),
               '/onboarding': (context) => const OnboardingScreen(),
@@ -69,62 +73,97 @@ class FarmerConnectApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  late final List<Widget> _screens;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const MarketplaceScreen(),
-    const FarmManagementScreen(),
-    const CommunityScreen(),
-    const FinanceScreen(),
-    const AIChatScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const HomeScreen(),
+      const MarketplaceScreen(),
+      const FarmManagementScreen(),
+      const CommunityScreen(),
+      const FinanceScreen(),
+      const AIChatScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: SalomonBottomBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          items: [
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.home_rounded),
+              title: const Text('Home'),
+              selectedColor: Colors.green.shade700,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.store_rounded),
+              title: const Text('Market'),
+              selectedColor: Colors.green.shade700,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.agriculture_rounded),
+              title: const Text('Farm'),
+              selectedColor: Colors.green.shade700,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.people_rounded),
+              title: const Text('Community'),
+              selectedColor: Colors.green.shade700,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.account_balance_wallet_rounded),
+              title: const Text('Finance'),
+              selectedColor: Colors.green.shade700,
+            ),
+            SalomonBottomBarItem(
+              icon: const Icon(Icons.chat_rounded),
+              title: const Text('AI'),
+              selectedColor: Colors.green.shade700,
+            ),
+          ],
+          itemShape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Marketplace',
+          itemPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.agriculture),
-            label: 'Farm',
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          margin: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Community',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Financial',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'AI Assistant',
-          ),
-        ],
+          backgroundColor: Colors.white,
+        ),
       ),
     );
   }

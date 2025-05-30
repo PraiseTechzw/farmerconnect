@@ -4,6 +4,8 @@ import 'package:farmer_connect/screens/auth/register_screen.dart';
 import 'package:farmer_connect/screens/auth/forgot_password_screen.dart';
 import 'package:farmer_connect/screens/auth/phone_verification_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:farmer_connect/screens/home/home_screen.dart';
+import 'package:farmer_connect/screens/auth/verification_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -33,49 +35,46 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.signIn(
+      final response = await _authService.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      if (!mounted) return;
-
-      // Check if phone is verified
-      final isPhoneVerified = await _authService.isPhoneVerified();
-      
-      if (!isPhoneVerified) {
-        // Get user's phone number
-        final user = _authService.currentUser;
-        if (user != null) {
-          final userData = await _authService.getUserData(user.id);
-          final phoneNumber = userData?['phone_number'] as String?;
-          
-          if (phoneNumber != null) {
-            // Send verification code
-            final verificationId = await _authService.sendPhoneVerificationCode(phoneNumber);
+      if (response.user != null) {
+        // Check if phone is verified
+        final isVerified = await _authService.isPhoneVerified();
+        
+        if (mounted) {
+          if (isVerified) {
+            // Clear the navigation stack and go to home
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false, // Remove all previous routes
+            );
+          } else {
+            // Navigate to phone verification
+            final verificationId = await _authService.sendPhoneVerificationCode(
+              response.user!.phone ?? '',
+            );
             
-            // Navigate to verification screen
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PhoneVerificationScreen(
-                  phoneNumber: phoneNumber,
+                builder: (context) => VerificationScreen(
+                  phoneNumber: response.user!.phone ?? '',
                   verificationId: verificationId,
                 ),
               ),
             );
-            return;
           }
         }
       }
-
-      // If phone is verified, proceed to home screen
-      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(e.toString()),
             backgroundColor: Colors.red,
           ),
         );

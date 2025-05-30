@@ -73,6 +73,7 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   flutter_animate: ^4.5.0
   country_picker: ^2.0.27
+  salomon_bottom_bar: ^3.3.2
 
 dev_dependencies:
   flutter_test:

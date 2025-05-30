@@ -70,21 +70,24 @@ class _ReportsScreenState extends State<ReportsScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
               expandedHeight: 200,
               pinned: true,
+              elevation: 0,
+              backgroundColor: Colors.transparent,
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                       colors: [
                         Colors.green[700]!,
-                        Colors.green[500]!,
+                        Colors.green[600]!,
                       ],
                     ),
                   ),
@@ -98,6 +101,7 @@ class _ReportsScreenState extends State<ReportsScreen>
                           color: Colors.white,
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -107,19 +111,43 @@ class _ReportsScreenState extends State<ReportsScreen>
                   ),
                 ),
               ),
-              bottom: TabBar(
-                controller: _tabController,
-                indicatorColor: Colors.white,
-                indicatorWeight: 3,
-                labelStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(48),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, -5),
+                      ),
+                    ],
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicatorColor: Colors.green[700],
+                    indicatorWeight: 3,
+                    labelColor: Colors.green[700],
+                    unselectedLabelColor: Colors.grey[600],
+                    labelStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.5,
+                    ),
+                    tabs: const [
+                      Tab(text: 'Overview'),
+                      Tab(text: 'Crop Analysis'),
+                      Tab(text: 'Trends'),
+                    ],
+                  ),
                 ),
-                tabs: const [
-                  Tab(text: 'Overview'),
-                  Tab(text: 'Crop Analysis'),
-                  Tab(text: 'Trends'),
-                ],
               ),
             ),
           ];
@@ -137,31 +165,41 @@ class _ReportsScreenState extends State<ReportsScreen>
   }
 
   Widget _buildReportFilters() {
-    return Padding(
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildFilterChip('This Month'),
-          _buildFilterChip('Last 3 Months'),
-          _buildFilterChip('This Year'),
+          _buildFilterChip('This Month', true),
+          const SizedBox(width: 8),
+          _buildFilterChip('Last 3 Months', false),
+          const SizedBox(width: 8),
+          _buildFilterChip('This Year', false),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(String label) {
+  Widget _buildFilterChip(String label, bool isSelected) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: isSelected ? Colors.white : Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
+        boxShadow: isSelected ? [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ] : null,
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: isSelected ? Colors.green[700] : Colors.white,
           fontSize: 14,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
         ),
       ),
     );
@@ -210,36 +248,45 @@ class _ReportsScreenState extends State<ReportsScreen>
   Widget _buildSummaryCard(
       String title, String amount, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 12),
           Text(
             amount,
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
             ),
           ),
+          const SizedBox(height: 4),
           Text(
             title,
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
