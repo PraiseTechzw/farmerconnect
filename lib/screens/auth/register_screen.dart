@@ -57,15 +57,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _authService.signUp(
+      // Sign up the user
+      final response = await _authService.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         fullName: _fullNameController.text.trim(),
         phoneNumber: '+${_selectedCountry?.phoneCode}${_phoneController.text.trim()}',
       );
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
+
+      if (!mounted) return;
+
+      // Send verification code
+      final verificationId = await _authService.sendPhoneVerificationCode(
+        '+${_selectedCountry?.phoneCode}${_phoneController.text.trim()}',
+      );
+
+      // Navigate to verification screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhoneVerificationScreen(
+            phoneNumber: '+${_selectedCountry?.phoneCode}${_phoneController.text.trim()}',
+            verificationId: verificationId,
+          ),
+        ),
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
