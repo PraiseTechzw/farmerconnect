@@ -62,6 +62,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // Format phone number with country code
       final formattedPhone = '+${_selectedCountry!.phoneCode}${_phoneController.text}';
 
+      // Store user data in Supabase metadata
+      await _authService.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        fullName: _fullNameController.text.trim(),
+        phoneNumber: formattedPhone,
+      );
+
       // Send verification code
       final verificationId = await _authService.sendPhoneVerificationCode(formattedPhone);
 

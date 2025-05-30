@@ -112,12 +112,17 @@ class AuthService {
       );
 
       if (response.user != null) {
-        // Update verification status
-        await _firebase.updateData(
-          'users',
-          response.user!.id,
-          {'is_phone_verified': true},
-        );
+        // Create user document in Firestore
+        final userData = {
+          'full_name': response.user!.userMetadata?['full_name'] ?? '',
+          'email': response.user!.email ?? '',
+          'phone_number': verificationId,
+          'is_phone_verified': true,
+          'created_at': DateTime.now().toIso8601String(),
+        };
+        
+        // Create the document with user ID
+        await _firebase.addDataWithId('users', response.user!.id, userData);
       }
     } catch (e) {
       rethrow;
