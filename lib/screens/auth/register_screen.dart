@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:farmer_connect/service/auth_service.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:farmer_connect/screens/auth/phone_verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);

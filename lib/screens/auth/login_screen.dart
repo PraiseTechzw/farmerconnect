@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:farmer_connect/service/auth_service.dart';
 import 'package:farmer_connect/screens/auth/register_screen.dart';
 import 'package:farmer_connect/screens/auth/forgot_password_screen.dart';
+import 'package:farmer_connect/screens/auth/phone_verification_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,9 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       await _authService.signIn(
@@ -40,20 +39,50 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (!mounted) return;
+
+      // Check if phone is verified
+      final isPhoneVerified = await _authService.isPhoneVerified();
+      
+      if (!isPhoneVerified) {
+        // Get user's phone number
+        final user = _authService.currentUser;
+        if (user != null) {
+          final userData = await _authService.getUserData(user.id);
+          final phoneNumber = userData?['phone_number'] as String?;
+          
+          if (phoneNumber != null) {
+            // Send verification code
+            final verificationId = await _authService.sendPhoneVerificationCode(phoneNumber);
+            
+            // Navigate to verification screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PhoneVerificationScreen(
+                  phoneNumber: phoneNumber,
+                  verificationId: verificationId,
+                ),
+              ),
+            );
+            return;
+          }
+        }
+      }
+
+      // If phone is verified, proceed to home screen
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
       }
     }
   }
