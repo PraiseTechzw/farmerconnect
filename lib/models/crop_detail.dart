@@ -4,6 +4,7 @@ class CropDetails {
   final String description;
   final String season;
   final String tips;
+  final String location;
 
   CropDetails({
     required this.cropName,
@@ -11,7 +12,7 @@ class CropDetails {
     required this.description,
     required this.season,
     required this.tips,
-    required String location,
+    required this.location,
   });
 
   // Factory constructor to parse from JSON
@@ -22,7 +23,7 @@ class CropDetails {
       description: json['description'],
       season: json['season'],
       tips: json['tips'],
-      location: 'Chinhoyi',
+      location: json['location'] ?? 'Unknown',
     );
   }
 }

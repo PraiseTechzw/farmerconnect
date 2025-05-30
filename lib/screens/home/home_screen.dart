@@ -1,10 +1,18 @@
-import 'package:farmer_connect/screens/farmers_interaction_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:farmer_connect/service/location_services.dart';
 import 'package:farmer_connect/service/weather_service.dart';
-import 'package:farmer_connect/widgets/weather_card.dart';
-import 'package:farmer_connect/widgets/crop_recomm.dart';
+import 'package:farmer_connect/screens/farm/crop_recommendations_screen.dart';
+import 'package:farmer_connect/screens/farm/crop_details_screen.dart';
+import 'package:farmer_connect/screens/ai/ai_chat_screen.dart';
+import 'package:farmer_connect/screens/marketplace/marketplace_screen.dart';
+import 'package:farmer_connect/screens/farm/farm_management_screen.dart';
+import 'package:farmer_connect/screens/community/community_screen.dart';
+import 'package:farmer_connect/screens/finance/finance_screen.dart';
+import 'package:farmer_connect/screens/farm/inventory_screen.dart';
+import 'package:farmer_connect/screens/farm/analytics_screen.dart';
+import 'package:farmer_connect/screens/farm/calendar_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:farmer_connect/providers/ai_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,8 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final position = await _locationService.getCurrentLocation();
       final weatherData = await _weatherApiService.fetchWeather(
-          position.latitude, position.longitude);
-      _location = '${position.latitude}, ${position.longitude}';
+          position['latitude'], position['longitude']);
+      _location = position['locationName'];
 
       setState(() {
         _weatherData = weatherData;
@@ -225,32 +233,57 @@ class _HomeScreenState extends State<HomeScreen> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisCount: 4,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 0.8,
             children: [
-              _buildActionButton(Icons.agriculture, 'Add Crop', () {
-                // Navigate to add crop screen
+              _buildActionButton(Icons.agriculture, 'Farm', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FarmManagementScreen()),
+                );
               }),
               _buildActionButton(Icons.inventory, 'Inventory', () {
-                // Navigate to inventory screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InventoryScreen()),
+                );
               }),
               _buildActionButton(Icons.store, 'Market', () {
-                // Navigate to marketplace screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MarketplaceScreen()),
+                );
               }),
-              _buildActionButton(Icons.calendar_today, 'Schedule', () {
-                // Navigate to schedule screen
+              _buildActionButton(Icons.calendar_today, 'Calendar', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CalendarScreen()),
+                );
               }),
               _buildActionButton(Icons.analytics, 'Analytics', () {
-                // Navigate to analytics screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
+                );
               }),
               _buildActionButton(Icons.people, 'Community', () {
-                // Navigate to community screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CommunityScreen()),
+                );
               }),
               _buildActionButton(Icons.account_balance_wallet, 'Finance', () {
-                // Navigate to finance screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FinanceScreen()),
+                );
               }),
-              _buildActionButton(Icons.settings, 'Settings', () {
-                // Navigate to settings screen
+              _buildActionButton(Icons.chat, 'AI Assistant', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AIChatScreen()),
+                );
               }),
             ],
           ),
@@ -266,25 +299,27 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.blue[100],
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               icon,
               color: Colors.blue[700],
-              size: 24,
+              size: 20,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -297,104 +332,185 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Recommended Crops',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Crop Recommendations',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CropRecommendationsScreen()),
+                  );
+                },
+                child: const Text('View All'),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 180,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.only(right: 16),
-                  child: Container(
-                    width: 160,
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.green[100],
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              _getCropIcon(index),
-                              size: 40,
-                              color: Colors.green[700],
+          if (_isLoading)
+            const Center(child: CircularProgressIndicator())
+          else
+            SizedBox(
+              height: 180,
+              child: Consumer<AIProvider>(
+                builder: (context, aiProvider, child) {
+                  if (aiProvider.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  
+                  // Use weather data to get recommendations
+                  final temperature = _weatherData?['currentConditions']['temp'] ?? 0;
+                  final humidity = _weatherData?['currentConditions']['humidity'] ?? 0;
+                  final conditions = _weatherData?['currentConditions']['conditions'] ?? '';
+                  
+                  // Get recommendations based on current weather
+                  final recommendations = _getWeatherBasedRecommendations(
+                    temperature: temperature,
+                    humidity: humidity,
+                    conditions: conditions,
+                  );
+                  
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: recommendations.length,
+                    itemBuilder: (context, index) {
+                      final recommendation = recommendations[index];
+                      return Card(
+                        margin: const EdgeInsets.only(right: 16),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const CropDetailsScreen()),
+                            );
+                          },
+                          child: Container(
+                            width: 160,
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: Colors.green[100],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      recommendation['icon'] as IconData,
+                                      size: 40,
+                                      color: Colors.green[700],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  recommendation['name'] as String,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  recommendation['description'] as String,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _getCropName(index),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _getCropDescription(index),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
         ],
       ),
     );
   }
 
-  IconData _getCropIcon(int index) {
-    final cropIcons = {
-      'Wheat': Icons.grain,
-      'Rice': Icons.grass,
-      'Corn': Icons.eco,
-      'Soybeans': Icons.spa,
-      'Cotton': Icons.filter_drama,
-    };
-
-    final cropName = _getCropName(index);
-    return cropIcons[cropName] ?? Icons.agriculture;
-  }
-
-  String _getCropName(int index) {
-    final crops = [
-      'Wheat',
-      'Rice',
-      'Corn',
-      'Soybeans',
-      'Cotton',
-    ];
-    return crops[index % crops.length];
-  }
-
-  String _getCropDescription(int index) {
-    final descriptions = [
-      'Best suited for current weather conditions',
-      'High market demand, good profit potential',
-      'Low maintenance, high yield variety',
-      'Drought-resistant, perfect for current season',
-      'Organic variety, premium market price',
-    ];
-    return descriptions[index % descriptions.length];
+  List<Map<String, dynamic>> _getWeatherBasedRecommendations({
+    required double temperature,
+    required double humidity,
+    required String conditions,
+  }) {
+    final recommendations = <Map<String, dynamic>>[];
+    
+    // Add recommendations based on temperature
+    if (temperature >= 25 && temperature <= 35) {
+      recommendations.add({
+        'name': 'Rice',
+        'icon': Icons.grass,
+        'description': 'Perfect temperature for rice cultivation. High humidity levels are ideal.',
+      });
+    }
+    
+    if (temperature >= 20 && temperature <= 30) {
+      recommendations.add({
+        'name': 'Corn',
+        'icon': Icons.eco,
+        'description': 'Optimal conditions for corn growth. Good moisture levels.',
+      });
+    }
+    
+    if (temperature >= 15 && temperature <= 25) {
+      recommendations.add({
+        'name': 'Wheat',
+        'icon': Icons.grain,
+        'description': 'Ideal temperature range for wheat cultivation.',
+      });
+    }
+    
+    // Add recommendations based on weather conditions
+    if (conditions.toLowerCase().contains('rain')) {
+      recommendations.add({
+        'name': 'Soybeans',
+        'icon': Icons.spa,
+        'description': 'Rainy conditions are favorable for soybean growth.',
+      });
+    }
+    
+    if (conditions.toLowerCase().contains('sunny')) {
+      recommendations.add({
+        'name': 'Cotton',
+        'icon': Icons.filter_drama,
+        'description': 'Sunny weather is perfect for cotton cultivation.',
+      });
+    }
+    
+    // Add drought-resistant crops if humidity is low
+    if (humidity < 40) {
+      recommendations.add({
+        'name': 'Millet',
+        'icon': Icons.grass,
+        'description': 'Drought-resistant crop suitable for current conditions.',
+      });
+    }
+    
+    // Ensure we have at least 3 recommendations
+    while (recommendations.length < 3) {
+      recommendations.add({
+        'name': 'Mixed Vegetables',
+        'icon': Icons.eco,
+        'description': 'Versatile crops suitable for various conditions.',
+      });
+    }
+    
+    return recommendations;
   }
 
   Widget _buildMarketInsights() {

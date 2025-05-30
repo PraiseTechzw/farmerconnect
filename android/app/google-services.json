@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "404727042349",
+    "project_id": "farmer-78451",
+    "storage_bucket": "farmer-78451.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404727042349:android:9b163c7f551ca22c8703a4",
+        "android_client_info": {
+          "package_name": "farmerconnect.appixia.co.zw.farmer_connect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2sKkYeJmSmcahYvAxwH25Ed_eSak_SQQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

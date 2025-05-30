@@ -1,15 +1,15 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class LocationService {
-  Future<Position> getCurrentLocation() async {
+  Future<Map<String, dynamic>> getCurrentLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      throw Exception(
-          'Location services are disabled. Please enable them in your device settings.');
+      throw Exception('Location services are disabled.');
     }
 
     // Check for location permissions
@@ -17,23 +17,49 @@ class LocationService {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        throw Exception(
-            'Location permissions are denied. Please grant location permissions to the app.');
+        throw Exception('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      throw Exception(
-          'Location permissions are permanently denied. Please enable them in your device settings.');
+      throw Exception('Location permissions are permanently denied');
     }
 
     // Get the current position
-    try {
-      return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-    } catch (e) {
-      throw Exception('Error getting location: $e');
+    final position = await Geolocator.getCurrentPosition();
+    
+    // Get address from coordinates
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+      position.latitude,
+      position.longitude,
+    );
+
+    if (placemarks.isNotEmpty) {
+      Placemark place = placemarks[0];
+      String locationName = '';
+      
+      // Build location name based on available data
+      if (place.administrativeArea != null) {
+        locationName = place.administrativeArea!;
+      }
+      if (place.subAdministrativeArea != null) {
+        locationName += ', ${place.subAdministrativeArea}';
+      }
+      if (place.locality != null) {
+        locationName += ', ${place.locality}';
+      }
+
+      return {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'locationName': locationName.isNotEmpty ? locationName : 'Unknown Location',
+      };
     }
+
+    return {
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+      'locationName': 'Unknown Location',
+    };
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:farmer_connect/screens/farm/crop_planning_screen.dart';
+import 'package:farmer_connect/screens/farm/crop_recommendations_screen.dart';
+import 'package:farmer_connect/screens/farm/crop_details_screen.dart';
 import 'package:farmer_connect/screens/farm/inventory_screen.dart';
 import 'package:farmer_connect/screens/farm/equipment_screen.dart';
 import 'package:farmer_connect/screens/farm/analytics_screen.dart';
@@ -175,60 +177,62 @@ class _FarmManagementScreenState extends State<FarmManagementScreen>
   }
 
   Widget _buildCropsTab(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        ListTile(
-          leading: const Icon(Icons.grass, color: Colors.green),
-          title: const Text('Crop Planning'),
-          subtitle: const Text('Manage crop schedules, planting, and harvest.'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const CropPlanningScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.calendar_today, color: Colors.blue),
-          title: const Text('Calendar View'),
-          subtitle: const Text('Visualize farm events and tasks.'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CalendarScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.cloud, color: Colors.lightBlue),
-          title: const Text('Weather Information'),
-          subtitle: const Text('Detailed weather data for your farm.'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const WeatherScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.task, color: Colors.purple),
-          title: const Text('Task Management'),
-          subtitle: const Text('Create, assign, and track farm tasks.'),
-          trailing: const Icon(Icons.arrow_forward_ios),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const TaskManagementScreen()),
-            );
-          },
-        ),
-      ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildSection(
+            context,
+            'AI-Powered Features',
+            [
+              _buildFeatureCard(
+                context,
+                'Crop Recommendations',
+                'Get AI-powered crop recommendations based on your local weather and conditions',
+                Icons.eco,
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CropRecommendationsScreen(),
+                  ),
+                ),
+              ),
+              _buildFeatureCard(
+                context,
+                'Crop Details',
+                'Get detailed information about specific crops in your area',
+                Icons.info,
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CropDetailsScreen(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            context,
+            'Farm Planning',
+            [
+              _buildFeatureCard(
+                context,
+                'Crop Planning',
+                'Plan and manage your crops',
+                Icons.calendar_today,
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CropPlanningScreen(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -326,6 +330,72 @@ class _FarmManagementScreenState extends State<FarmManagementScreen>
               },
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(BuildContext context, String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 16),
+        ...children,
+      ],
+    );
+  }
+
+  Widget _buildFeatureCard(
+    BuildContext context,
+    String title,
+    String description,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  color: Theme.of(context).primaryColor,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
         ),
       ),
     );
