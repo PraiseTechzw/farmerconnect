@@ -29,15 +29,27 @@ class FirebaseService {
 
   // Firestore methods
   Future<void> addData(String collection, Map<String, dynamic> data) async {
-    await _firestore.collection(collection).add(data);
+    try {
+      await _firestore.collection(collection).add(data);
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<void> updateData(String collection, String docId, Map<String, dynamic> data) async {
-    await _firestore.collection(collection).doc(docId).update(data);
+  Future<void> updateData(String collection, String documentId, Map<String, dynamic> data) async {
+    try {
+      await _firestore.collection(collection).doc(documentId).update(data);
+    } catch (e) {
+      rethrow;
+    }
   }
 
-  Future<void> deleteData(String collection, String docId) async {
-    await _firestore.collection(collection).doc(docId).delete();
+  Future<void> deleteData(String collection, String documentId) async {
+    try {
+      await _firestore.collection(collection).doc(documentId).delete();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Stream<QuerySnapshot> getDataStream(String collection) {
@@ -53,5 +65,15 @@ class FirebaseService {
 
   Future<void> deleteFile(String path) async {
     await _storage.ref().child(path).delete();
+  }
+
+  // Get data from a collection
+  Future<Map<String, dynamic>?> getData(String collection, String documentId) async {
+    try {
+      final doc = await _firestore.collection(collection).doc(documentId).get();
+      return doc.data();
+    } catch (e) {
+      rethrow;
+    }
   }
 } 
